@@ -5,12 +5,14 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
+from pyssg.build import Build
+from pyssg.config import Config
 from pyssg.models import Source
-from pyssg_plugins.permalink import Permalink, slugify
+from pyssg_plugins.permalink import Permalink, resolve_slugify, slugify
 
 
 def render(source: Source, plugin: Permalink | None = None) -> Source:
-    (plugin or Permalink())._assign(source)
+    (plugin or Permalink())._assign(source, slugify)
     return source
 
 
@@ -24,6 +26,34 @@ class SlugifyTest(unittest.TestCase):
 
     def test_strips_punctuation_and_edges(self) -> None:
         self.assertEqual(slugify("  A, B & C!  "), "a-b-c")
+
+    def test_vietnamese_diacritics(self) -> None:
+        self.assertEqual(slugify("Lập trình bất đồng bộ"), "lap-trinh-bat-dong-bo")
+
+    def test_other_scripts(self) -> None:
+        self.assertEqual(slugify("Größe"), "grosse")
+        self.assertEqual(slugify("北京欢迎你"), "bei-jing-huan-ying-ni")
+
+
+class ResolveSlugifyTest(unittest.TestCase):
+    def _build(self, slug: object = None) -> Build:
+        config = Config(src=Path("content"), out=Path("public"))
+        if slug is not None:
+            config.slugify = slug  # type: ignore[assignment]
+        return Build(config=config)
+
+    def test_defaults_to_builtin(self) -> None:
+        self.assertIs(resolve_slugify(self._build()), slugify)
+
+    def test_config_override_wins(self) -> None:
+        build = self._build(lambda text: text.upper())
+        self.assertEqual(resolve_slugify(build)("abc"), "ABC")
+
+    def test_override_drives_pattern(self) -> None:
+        build = self._build(lambda text: "fixed")
+        build.sources.append(src("x.md", title="Anything"))
+        Permalink(pattern="/p/:title/")._collect(build)
+        self.assertEqual(build.sources[0].meta["url"], "/p/fixed/")
 
 
 class PrettyUrlTest(unittest.TestCase):
