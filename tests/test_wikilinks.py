@@ -70,6 +70,47 @@ class ResolveTest(unittest.TestCase):
         self.assertIn(">A&amp;B</a>", out)
 
 
+class AliasAnchorTest(unittest.TestCase):
+    def test_alias_overrides_display_text(self) -> None:
+        build = make_build({"Note.md": "/note/"})
+        out = transform(build, "<p>[[Note|click here]]</p>")
+        self.assertIn('<a class="wikilink" href="/note/">click here</a>', out)
+
+    def test_heading_anchor_is_slugified(self) -> None:
+        build = make_build({"Note.md": "/note/"})
+        out = transform(build, "<p>[[Note#My Heading]]</p>")
+        self.assertIn('href="/note/#my-heading"', out)
+        self.assertIn(">Note &gt; My Heading</a>", out)
+
+    def test_heading_and_alias_combined(self) -> None:
+        build = make_build({"Note.md": "/note/"})
+        out = transform(build, "<p>[[Note#Sec|see section]]</p>")
+        self.assertIn('href="/note/#sec"', out)
+        self.assertIn(">see section</a>", out)
+
+    def test_same_page_heading_anchor(self) -> None:
+        build = make_build({})
+        out = transform(build, "<p>[[#Local Section]]</p>", relpath="page.md")
+        self.assertIn('href="/page/#local-section"', out)
+        self.assertIn(">Local Section</a>", out)
+
+    def test_empty_alias_falls_back_to_default_text(self) -> None:
+        build = make_build({"Note.md": "/note/"})
+        out = transform(build, "<p>[[Note|]]</p>")
+        self.assertIn(">Note</a>", out)
+
+    def test_first_pipe_splits_alias(self) -> None:
+        build = make_build({"Note.md": "/note/"})
+        out = transform(build, "<p>[[Note|a|b]]</p>")
+        self.assertIn(">a|b</a>", out)
+
+    def test_empty_target_is_left_literal(self) -> None:
+        build = make_build({})
+        out = transform(build, "<p>[[ ]]</p>")
+        self.assertIn("[[ ]]", out)
+        self.assertNotIn("<a", out)
+
+
 class BrokenTest(unittest.TestCase):
     def test_unresolved_renders_broken_span(self) -> None:
         build = make_build({})
@@ -82,6 +123,13 @@ class BrokenTest(unittest.TestCase):
         recorded = build.meta.get(BROKEN_LINKS)
         assert isinstance(recorded, list)
         self.assertEqual(recorded, [BrokenLink("notes/a.md", "[[Ghost]]")])
+
+    def test_unresolved_records_raw_with_anchor_and_alias(self) -> None:
+        build = make_build({})
+        transform(build, "<p>[[Ghost#X|t]]</p>", relpath="a.md")
+        recorded = build.meta.get(BROKEN_LINKS)
+        assert isinstance(recorded, list)
+        self.assertEqual(recorded[0], BrokenLink("a.md", "[[Ghost#X|t]]"))
 
 
 class CodeProtectionTest(unittest.TestCase):

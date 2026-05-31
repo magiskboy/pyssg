@@ -9,14 +9,20 @@ examples are never rewritten.
 A ``[[Note Title]]`` target is resolved against a name index built from
 ``build.sources``: a page is addressable by its file stem (``Note Title.md`` ->
 ``[[Note Title]]``) or by a path without the suffix (``[[folder/Note]]``), both
-matched case-insensitively. The link text is the note title as written.
+matched case-insensitively. Two variants are supported on top of the base form:
+
+- ``[[Note|custom text]]`` -- an explicit display alias.
+- ``[[Note#Heading]]`` -- a link to a slugified heading id on the target page;
+  ``[[#Heading]]`` (empty name) anchors within the current page.
+
+The link text defaults to the target as written (``Note``, ``Note > Heading``,
+or the heading alone) unless an alias overrides it; it is always HTML-escaped.
 
 Unresolved targets render as a clearly-marked broken ``<span>`` and are recorded
 in ``build.meta["broken_links"]`` so the BrokenLinks plugin can report them.
 
-Aliases/anchors (``[[note|alias]]``, ``[[note#heading]]``) and embeds
-(``![[note]]``) are tracked separately (issues #20, #21); embeds are explicitly
-left untouched here. The plugin uses the standard library only.
+Embeds (``![[note]]``) are tracked separately (issue #21) and left untouched
+here. The plugin uses the standard library only.
 """
 
 from __future__ import annotations
@@ -29,6 +35,7 @@ from pyssg.builder import Builder
 from pyssg.content import URL
 from pyssg.models import Source
 from pyssg_plugins.link_resolver import BrokenLink, broken_links
+from pyssg_plugins.permalink import slugify
 
 # Run after Markdown's transform (stage 0); the literal ``[[...]]`` text exists by
 # then. Resolved links carry final URLs, so the LinkResolver (stage 50) ignores
@@ -77,14 +84,26 @@ class WikiLink:
         return source
 
     def _render(
-        self, name: str, source: Source, build: Build, index: dict[str, str]
+        self, raw: str, source: Source, build: Build, index: dict[str, str]
     ) -> str:
-        url = index.get(name.casefold())
-        text = html.escape(name)
+        name, heading, alias = _parse(raw)
+        if not name and not heading:
+            return f"[[{raw}]]"
+
+        if name:
+            url = index.get(name.casefold())
+        else:
+            # ``[[#Heading]]`` anchors within the current page.
+            current = source.meta.get(URL)
+            url = current if isinstance(current, str) else None
+
+        text = html.escape(alias or _default_text(name, heading))
         if url is None:
-            _record_broken(build, source, name)
+            _record_broken(build, source, raw)
             return f'<span class="{self._broken_class}">{text}</span>'
-        return f'<a class="{self._link_class}" href="{url}">{text}</a>'
+
+        href = f"{url}#{slugify(heading)}" if heading else url
+        return f'<a class="{self._link_class}" href="{href}">{text}</a>'
 
 
 def _index(build: Build) -> dict[str, str]:
@@ -108,5 +127,24 @@ def _index(build: Build) -> dict[str, str]:
     return index
 
 
-def _record_broken(build: Build, source: Source, name: str) -> None:
-    broken_links(build).append(BrokenLink(source.relpath.as_posix(), f"[[{name}]]"))
+def _parse(raw: str) -> tuple[str, str, str]:
+    """Split a wikilink body into ``(name, heading, alias)``.
+
+    ``Note#Heading|alias`` -> ``("Note", "Heading", "alias")``. The alias is the
+    text after the first ``|``; the heading is the text after the first ``#`` in
+    the part before that ``|``. Empty components come back as ``""``.
+    """
+
+    target, sep, alias = raw.partition("|")
+    name, _, heading = target.partition("#")
+    return name.strip(), heading.strip(), alias.strip() if sep else ""
+
+
+def _default_text(name: str, heading: str) -> str:
+    if name and heading:
+        return f"{name} > {heading}"
+    return name or heading
+
+
+def _record_broken(build: Build, source: Source, raw: str) -> None:
+    broken_links(build).append(BrokenLink(source.relpath.as_posix(), f"[[{raw}]]"))
