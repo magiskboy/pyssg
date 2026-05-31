@@ -1,0 +1,7 @@
+{% if paginator and paginator.total_pages > 1 %}
+<nav class="pagination">
+  {% if paginator.prev_url %}<a class="prev" href="{{ paginator.prev_url }}">&larr; Newer</a>{% endif %}
+  <span class="page-of">Page {{ paginator.number }} of {{ paginator.total_pages }}</span>
+  {% if paginator.next_url %}<a class="next" href="{{ paginator.next_url }}">Older &rarr;</a>{% endif %}
+</nav>
+{% endif %}

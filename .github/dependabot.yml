@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # Keep GitHub Actions used by the workflows current.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci"
+
+  # Keep Python dev/build dependencies current (runtime is stdlib-only).
+  - package-ecosystem: uv
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "deps"

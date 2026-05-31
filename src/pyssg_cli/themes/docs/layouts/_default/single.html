@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block main %}
+  {% if page.url == '/' %}{{ partial("partials/hero.html", {"page": page}) }}{% endif %}
+  <article>
+    {{ content }}
+  </article>
+  {{ partial("partials/prevnext.html", {"prev": page.prev, "next": page.next}) }}
+{% endblock %}

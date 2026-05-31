@@ -1,0 +1,11 @@
+# Netlify build configuration for a pyssg site. Copy this to your project root.
+#
+# Netlify images ship Python but not uv, so the build uses pip. Adjust the
+# extras to match your project's plugin dependencies.
+
+[build]
+  command = "pip install 'pyssg[plugins]' && pyssg build"
+  publish = "public"
+
+[build.environment]
+  PYTHON_VERSION = "3.13"

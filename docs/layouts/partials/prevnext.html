@@ -1,0 +1,10 @@
+<nav class="prevnext">
+  {% if prev %}<a class="prev" href="{{ prev.url }}">
+    <span class="pn-label">&larr; Previous</span>
+    <span class="pn-title">{{ prev.title }}</span>
+  </a>{% endif %}
+  {% if next %}<a class="next" href="{{ next.url }}">
+    <span class="pn-label">Next &rarr;</span>
+    <span class="pn-title">{{ next.title }}</span>
+  </a>{% endif %}
+</nav>

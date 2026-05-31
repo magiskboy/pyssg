@@ -1,0 +1,31 @@
+# Optional: deploy to Cloudflare Pages from CI with Wrangler.
+#
+# Simpler alternative -- skip this file and configure the build in the
+# Cloudflare dashboard:
+#   Build command:           pip install "pyssg[plugins]" && pyssg build
+#   Build output directory:  public
+#   Environment variable:    PYTHON_VERSION = 3.13
+#
+# This workflow instead builds in GitHub Actions and uploads with Wrangler.
+# Requires repo secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID, and a
+# Pages project (rename --project-name below to match yours).
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Build site
+        run: uv run --python 3.13 --with "pyssg[plugins]" pyssg build
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy public --project-name=my-pyssg-site

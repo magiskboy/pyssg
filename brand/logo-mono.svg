@@ -1,0 +1,15 @@
+<svg width="96" height="96" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="pyssg">
+  <!-- Single-color mark. Uses currentColor when inlined, so it follows the
+       surrounding text color; falls back to a solid value when used as <img>. -->
+  <g stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M17.5 13.5 V38.5"/>
+    <circle cx="24.8" cy="21" r="7.3"/>
+    <path d="M32.1 21 L37 31.5" stroke-width="1.9"/>
+  </g>
+  <g fill="currentColor">
+    <circle cx="17.5" cy="13.5" r="3.5"/>
+    <circle cx="32.1" cy="21" r="3.5"/>
+    <circle cx="17.5" cy="38.5" r="3.2"/>
+    <circle cx="37" cy="31.5" r="3.2"/>
+  </g>
+</svg>

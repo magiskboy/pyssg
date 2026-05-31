@@ -1,0 +1,16 @@
+# Deploy recipe manifest -- static data only (parsed with tomllib).
+
+[target]
+name        = "netlify"
+title       = "Netlify"
+homepage    = "https://docs.netlify.com"
+publish_dir = "public"            # must equal Config.out
+
+# pyssg emits root-absolute links, so serve from the domain root (Netlify's
+# default subdomain or a custom domain both qualify).
+root_served_only = true
+
+# Netlify reads netlify.toml from the project root; copy it there.
+[[project_files]]
+path   = "netlify.toml"
+source = "netlify.toml"

@@ -1,0 +1,15 @@
+<nav>
+  <a class="nav-home{% if current_url == '/' %} active{% endif %}" href="/">Home</a>
+  {% for node in menus.main recursive %}
+    <div class="nav-group">
+      {% if node.url %}
+        <a class="nav-link{% if node.url == current_url %} active{% endif %}" href="{{ node.url }}">{{ node.title }}</a>
+      {% else %}
+        <span class="nav-header">{{ node.title }}</span>
+      {% endif %}
+      {% if node.children %}
+        <div class="nav-children">{{ loop(node.children) }}</div>
+      {% endif %}
+    </div>
+  {% endfor %}
+</nav>

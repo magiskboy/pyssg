@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block main %}
+  <article>
+    {{ content }}
+    <ul class="entry-list">
+      {% for entry in page.entries %}
+        {{ partial("partials/entry.html", {"entry": entry}) }}
+      {% endfor %}
+    </ul>
+  </article>
+{% endblock %}

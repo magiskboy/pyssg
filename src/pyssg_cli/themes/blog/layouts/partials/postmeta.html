@@ -1,0 +1,8 @@
+<p class="postmeta">
+  {% if entry.date %}<time datetime="{{ entry.date }}">{{ entry.date }}</time>{% endif %}
+  {% if entry.tags %}
+    <span class="tags">
+      {% for tag in entry.tags %}<a class="tag" href="/tags/{{ tag | lower }}/">#{{ tag }}</a>{% endfor %}
+    </span>
+  {% endif %}
+</p>

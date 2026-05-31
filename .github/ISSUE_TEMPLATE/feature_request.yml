@@ -1,0 +1,25 @@
+name: Feature request
+description: Suggest a new plugin, theme, or capability
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do that pyssg does not support today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: >
+        How might this work? If it is a new capability, note whether it fits as a
+        plugin (kernel stays dependency-free) or touches the kernel itself.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you evaluated, or how you work around this today.

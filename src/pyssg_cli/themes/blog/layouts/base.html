@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% if page.title and page.title != site.title %}{{ page.title }} · {{ site.title }}{% else %}{{ site.title }}{% endif %}{% endblock %}</title>
+  {% block head %}{{ partial("partials/seo.html", {"page": page}) }}{% endblock %}
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  {{ partial("partials/header.html", {"current_url": page.url}) }}
+
+  <main class="content">
+    {% block main %}{% endblock %}
+  </main>
+
+  {{ partial("partials/footer.html") }}
+</body>
+</html>

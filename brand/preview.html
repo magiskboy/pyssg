@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pyssg brand preview</title>
+<style>
+  body { margin:0; font:15px/1.5 -apple-system,Segoe UI,Roboto,sans-serif; background:#fff; color:#111; }
+  .row { display:flex; align-items:center; gap:40px; padding:32px 40px; flex-wrap:wrap; }
+  .dark { background:#0d1117; color:#e6edf3; }
+  .swatch { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .swatch span { font-size:12px; opacity:.6; }
+  img.s16{width:16px;height:16px} img.s24{width:24px;height:24px} img.s32{width:32px;height:32px}
+  img.s48{width:48px;height:48px} img.s64{width:64px;height:64px} img.s96{width:96px;height:96px}
+  h2 { padding:24px 40px 0; margin:0; font-size:13px; text-transform:uppercase; letter-spacing:.08em; opacity:.5;}
+  .lockup { display:flex; align-items:center; gap:12px; font-weight:800; font-size:30px; letter-spacing:-.02em;}
+  .lockup .name { background:linear-gradient(120deg,#111 30%,#6D45D8); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
+  .dark .lockup .name { background:linear-gradient(120deg,#fff 30%,#a78bfa); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
+</style>
+</head>
+<body>
+  <h2>Icon (tile) on light</h2>
+  <div class="row">
+    <div class="swatch"><img class="s16" src="logo-icon.svg"><span>16</span></div>
+    <div class="swatch"><img class="s24" src="logo-icon.svg"><span>24</span></div>
+    <div class="swatch"><img class="s32" src="logo-icon.svg"><span>32</span></div>
+    <div class="swatch"><img class="s64" src="logo-icon.svg"><span>64</span></div>
+    <div class="swatch"><img class="s96" src="logo-icon.svg"><span>96</span></div>
+    <div class="lockup"><img class="s48" src="logo-icon.svg"><span class="name">pyssg</span></div>
+  </div>
+
+  <h2>Icon (tile) on dark</h2>
+  <div class="row dark">
+    <div class="swatch"><img class="s16" src="logo-icon.svg"><span>16</span></div>
+    <div class="swatch"><img class="s32" src="logo-icon.svg"><span>32</span></div>
+    <div class="swatch"><img class="s64" src="logo-icon.svg"><span>64</span></div>
+    <div class="lockup"><img class="s48" src="logo-icon.svg"><span class="name">pyssg</span></div>
+  </div>
+
+  <h2>Wordmark lockup &amp; mono (inlined so currentColor themes)</h2>
+  <div class="row" id="inlined"></div>
+  <div class="row dark" id="inlined-dark"></div>
+  <script>
+    Promise.all(['logo-wordmark.svg','logo-mono.svg'].map(f=>fetch(f).then(r=>r.text())))
+      .then(([wm,mono])=>{
+        document.getElementById('inlined').innerHTML =
+          '<div style="height:44px;color:#1f2328">'+wm+'</div>'+
+          '<div style="height:56px;color:#1f2328">'+mono+'</div>';
+        document.getElementById('inlined-dark').innerHTML =
+          '<div style="height:44px;color:#e6edf3">'+wm+'</div>'+
+          '<div style="height:56px;color:#e6edf3">'+mono+'</div>';
+        document.querySelectorAll('#inlined svg,#inlined-dark svg').forEach(s=>{s.style.height='100%';s.style.width='auto';});
+      });
+  </script>
+
+  <h2>Mark (transparent) on light / dark</h2>
+  <div class="row">
+    <div class="swatch"><img class="s32" src="logo-mark.svg"><span>32</span></div>
+    <div class="swatch"><img class="s64" src="logo-mark.svg"><span>64</span></div>
+    <div class="swatch"><img class="s96" src="logo-mark.svg"><span>96</span></div>
+  </div>
+  <div class="row dark">
+    <div class="swatch"><img class="s32" src="logo-mark.svg"><span>32</span></div>
+    <div class="swatch"><img class="s64" src="logo-mark.svg"><span>64</span></div>
+    <div class="swatch"><img class="s96" src="logo-mark.svg"><span>96</span></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+# Run `uv run pre-commit install` once to enable. Keep hook versions current with
+# `uv run pre-commit autoupdate`.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      # mypy needs the whole project and the project's environment, so run it
+      # through uv on the full source tree rather than on staged files only.
+      - id: mypy
+        name: mypy (strict)
+        entry: uv run mypy
+        language: system
+        types: [python]
+        pass_filenames: false

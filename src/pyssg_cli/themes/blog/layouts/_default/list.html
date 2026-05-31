@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block main %}
+  <div class="listing">
+    <h1 class="list-title">{{ page.title }}</h1>
+    {{ content }}
+    <ul class="post-list">
+      {% for entry in page.entries %}
+        <li class="post-item">
+          <a class="post-link" href="{{ entry.url }}">{{ entry.title }}</a>
+          {{ partial("partials/postmeta.html", {"entry": entry}) }}
+          {% if entry.summary %}<p class="summary">{{ entry.summary }}</p>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    {{ partial("partials/pagination.html", {"paginator": page.paginator}) }}
+  </div>
+{% endblock %}

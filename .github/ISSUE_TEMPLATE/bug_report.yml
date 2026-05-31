@@ -1,0 +1,43 @@
+name: Bug report
+description: Report something that is not working as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to file a bug report.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, including what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: A minimal config, content tree, or command sequence that triggers the bug.
+      placeholder: |
+        1. pyssg new site --theme docs
+        2. pyssg build
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: pyssg version (or git commit), Python version, OS, and installed extras.
+      placeholder: |
+        pyssg: 0.1.0 (git+https://github.com/magiskboy/pyssg@<sha>)
+        Python: 3.13.x
+        OS: macOS 14 / Ubuntu 24.04 / Windows 11
+        Extras: pyssg[plugins]
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or traceback
+      description: Run with `--traceback` (or `PYSSG_TRACEBACK=1`) and paste the full output.
+      render: shell
