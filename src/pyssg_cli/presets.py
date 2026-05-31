@@ -26,6 +26,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from pyssg.plugin import Plugin
+from pyssg_plugins.broken_links import BrokenLinks
 from pyssg_plugins.collections import Collections
 from pyssg_plugins.frontmatter import Frontmatter
 from pyssg_plugins.highlight import Highlight
@@ -59,7 +60,13 @@ def _head(markdown_extensions: Sequence[str], highlight: bool) -> list[Plugin]:
 
 
 def _extras(
-    *, sitemap: bool, minify: bool, robots: bool, markdown_pages: bool
+    *,
+    sitemap: bool,
+    minify: bool,
+    robots: bool,
+    markdown_pages: bool,
+    broken_links: bool,
+    strict_links: bool,
 ) -> list[Plugin]:
     extras: list[Plugin] = []
     if sitemap:
@@ -68,6 +75,8 @@ def _extras(
         extras.append(Robots())
     if markdown_pages:
         extras.append(MarkdownPage())
+    if broken_links or strict_links:
+        extras.append(BrokenLinks(strict=strict_links))
     if minify:
         extras.append(Minify())
     return extras
@@ -86,6 +95,8 @@ def docs(
     minify: bool = False,
     robots: bool = False,
     markdown_pages: bool = False,
+    broken_links: bool = False,
+    strict_links: bool = False,
     seo: bool = True,
     highlight: bool = False,
 ) -> list[Plugin]:
@@ -99,6 +110,8 @@ def docs(
             minify=minify,
             robots=robots,
             markdown_pages=markdown_pages,
+            broken_links=broken_links,
+            strict_links=strict_links,
         ),
         *([Seo(schema_type="Article")] if seo else []),
         *_tail(template_dir, clean),
@@ -116,6 +129,8 @@ def blog(
     minify: bool = False,
     robots: bool = False,
     markdown_pages: bool = False,
+    broken_links: bool = False,
+    strict_links: bool = False,
     seo: bool = True,
     highlight: bool = False,
 ) -> list[Plugin]:
@@ -137,6 +152,8 @@ def blog(
             minify=minify,
             robots=robots,
             markdown_pages=markdown_pages,
+            broken_links=broken_links,
+            strict_links=strict_links,
         )
     )
     if seo:
@@ -159,6 +176,8 @@ def i18n_blog(
     minify: bool = False,
     robots: bool = False,
     markdown_pages: bool = False,
+    broken_links: bool = False,
+    strict_links: bool = False,
     seo: bool = True,
     highlight: bool = False,
 ) -> list[Plugin]:
@@ -213,6 +232,8 @@ def i18n_blog(
             minify=minify,
             robots=robots,
             markdown_pages=markdown_pages,
+            broken_links=broken_links,
+            strict_links=strict_links,
         )
     )
     if seo:
@@ -232,6 +253,8 @@ def i18n_docs(
     minify: bool = False,
     robots: bool = False,
     markdown_pages: bool = False,
+    broken_links: bool = False,
+    strict_links: bool = False,
     seo: bool = True,
     highlight: bool = False,
 ) -> list[Plugin]:
@@ -260,6 +283,8 @@ def i18n_docs(
             minify=minify,
             robots=robots,
             markdown_pages=markdown_pages,
+            broken_links=broken_links,
+            strict_links=strict_links,
         ),
         *([Seo(schema_type="Article")] if seo else []),
         *_tail(template_dir, clean),
@@ -276,6 +301,8 @@ def site(
     minify: bool = False,
     robots: bool = False,
     markdown_pages: bool = False,
+    broken_links: bool = False,
+    strict_links: bool = False,
     seo: bool = True,
     highlight: bool = False,
 ) -> list[Plugin]:
@@ -288,6 +315,8 @@ def site(
             minify=minify,
             robots=robots,
             markdown_pages=markdown_pages,
+            broken_links=broken_links,
+            strict_links=strict_links,
         ),
         *([Seo(schema_type="Article")] if seo else []),
         *_tail(template_dir, clean),

@@ -13,9 +13,10 @@ final URL. The target is resolved against a registry built from ``build.sources`
 keyed by source relpath; ``..`` segments are normalized and percent-encoded names
 are decoded before lookup. The ``?query`` and ``#anchor`` are preserved.
 
-Links that do not resolve (external, scheme/protocol-relative, anchor-only, or
-pointing at an unknown file) are left untouched -- broken-link detection is a
-separate concern (see issue #22). This step is the foundation for wikilinks,
+External, scheme/protocol-relative and anchor-only links are left untouched. An
+internal ``.md`` link whose target is absent from the registry is also left
+untouched, but is recorded in ``build.meta["broken_links"]`` so the BrokenLinks
+plugin can report it (see issue #22). This step is the foundation for wikilinks,
 broken-link detection and backlinks.
 
 The plugin uses the standard library only.
@@ -26,6 +27,7 @@ from __future__ import annotations
 import posixpath
 import re
 from collections.abc import Sequence
+from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from urllib.parse import unquote
 
@@ -47,6 +49,18 @@ _SCHEME_RE = re.compile(r"[a-zA-Z][a-zA-Z0-9+.-]*:")
 
 _REGISTRY_KEY = "_link_registry"
 
+# build.meta key holding the internal links the resolver could not resolve. The
+# BrokenLinks plugin reads it to report or fail the build (see issue #22).
+BROKEN_LINKS = "broken_links"
+
+
+@dataclass(frozen=True, slots=True)
+class BrokenLink:
+    """An internal ``.md`` link whose target is absent from the page registry."""
+
+    source: str  # relpath (posix) of the page containing the link
+    href: str  # the original, unresolved href
+
 
 class LinkResolver:
     def __init__(self, *, suffixes: Sequence[str] = (".md", ".markdown")) -> None:
@@ -61,9 +75,10 @@ class LinkResolver:
         if not source.content:
             return source
         registry = _registry(build)
+        broken = _broken_links(build)
 
         def replace(match: re.Match[str]) -> str:
-            resolved = self._resolve(match.group(3), source.relpath, registry)
+            resolved = self._resolve(match.group(3), source.relpath, registry, broken)
             if resolved is None:
                 return match.group(0)
             return f"{match.group(1)}{match.group(2)}{resolved}{match.group(2)}"
@@ -72,8 +87,40 @@ class LinkResolver:
         return source
 
     def _resolve(
-        self, href: str, relpath: Path, registry: dict[str, str]
+        self,
+        href: str,
+        relpath: Path,
+        registry: dict[str, str],
+        broken: list[BrokenLink],
     ) -> str | None:
+        parsed = self._parse_internal(href, relpath)
+        if parsed is None:
+            # Not an internal ``.md`` link (external, anchor-only, ...): skip it.
+            return None
+
+        key, query_sep, query, hash_sep, fragment = parsed
+        url = registry.get(key) if key is not None else None
+        if url is None:
+            # Internal link to a page the registry doesn't know: record and leave
+            # the href untouched for the BrokenLinks plugin to report.
+            broken.append(BrokenLink(relpath.as_posix(), href))
+            return None
+
+        suffix = ("?" + query if query_sep else "") + (
+            "#" + fragment if hash_sep else ""
+        )
+        return url + suffix
+
+    def _parse_internal(
+        self, href: str, relpath: Path
+    ) -> tuple[str | None, str, str, str, str] | None:
+        """Parse an internal ``.md`` link into ``(key, qsep, query, hsep, frag)``.
+
+        Returns ``None`` when ``href`` is not an internal content link at all. For
+        an internal link the ``key`` is the resolved registry key, or ``None`` when
+        the target escapes the content root (treated as broken by the caller).
+        """
+
         if not href or href.startswith("#") or href.startswith("//"):
             return None
         if _SCHEME_RE.match(href):
@@ -88,17 +135,7 @@ class LinkResolver:
         if PurePosixPath(decoded).suffix.lower() not in self._suffixes:
             return None
 
-        key = _normalize(decoded, relpath)
-        if key is None:
-            return None
-        url = registry.get(key)
-        if url is None:
-            return None
-
-        suffix = ("?" + query if query_sep else "") + (
-            "#" + fragment if hash_sep else ""
-        )
-        return url + suffix
+        return _normalize(decoded, relpath), query_sep, query, hash_sep, fragment
 
 
 def _registry(build: Build) -> dict[str, str]:
@@ -114,6 +151,17 @@ def _registry(build: Build) -> dict[str, str]:
     }
     build.meta[_REGISTRY_KEY] = registry
     return registry
+
+
+def _broken_links(build: Build) -> list[BrokenLink]:
+    """Return the accumulator for unresolved internal links, creating it once."""
+
+    existing = build.meta.get(BROKEN_LINKS)
+    if isinstance(existing, list):
+        return existing
+    fresh: list[BrokenLink] = []
+    build.meta[BROKEN_LINKS] = fresh
+    return fresh
 
 
 def _normalize(path: str, relpath: Path) -> str | None:

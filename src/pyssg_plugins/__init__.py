@@ -13,6 +13,7 @@ docs, blogs and company sites. They share one content model (see
 
 from __future__ import annotations
 
+from pyssg_plugins.broken_links import BrokenLinks
 from pyssg_plugins.collections import Collections
 from pyssg_plugins.dev_server import DevServer
 from pyssg_plugins.fingerprint import Fingerprint
@@ -38,6 +39,7 @@ from pyssg_plugins.template import Template
 from pyssg_plugins.write_file import WriteFile
 
 __all__ = [
+    "BrokenLinks",
     "Collections",
     "DevServer",
     "Fingerprint",

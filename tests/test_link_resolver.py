@@ -9,7 +9,7 @@ from pyssg.build import Build
 from pyssg.config import Config
 from pyssg.content import URL
 from pyssg.models import Source
-from pyssg_plugins.link_resolver import LinkResolver
+from pyssg_plugins.link_resolver import BROKEN_LINKS, BrokenLink, LinkResolver
 
 
 def make_build(pages: dict[str, str]) -> Build:
@@ -147,6 +147,42 @@ class MultipleAndEmptyTest(unittest.TestCase):
         build = make_build({"foo.md": "/foo/"})
         transform(build, "a.md", '<a href="foo.md">x</a>')
         self.assertIn("_link_registry", build.meta)
+
+
+class BrokenRecordingTest(unittest.TestCase):
+    def broken(self, build: Build) -> list[BrokenLink]:
+        recorded = build.meta.get(BROKEN_LINKS, [])
+        assert isinstance(recorded, list)
+        return recorded
+
+    def test_unknown_target_is_recorded(self) -> None:
+        build = make_build({})
+        transform(build, "notes/a.md", '<a href="missing.md">x</a>')
+        recorded = self.broken(build)
+        self.assertEqual(len(recorded), 1)
+        self.assertEqual(recorded[0], BrokenLink("notes/a.md", "missing.md"))
+
+    def test_escape_above_root_is_recorded(self) -> None:
+        build = make_build({"foo.md": "/foo/"})
+        transform(build, "a.md", '<a href="../../foo.md">x</a>')
+        self.assertEqual(self.broken(build)[0].href, "../../foo.md")
+
+    def test_resolved_link_is_not_recorded(self) -> None:
+        build = make_build({"foo.md": "/foo/"})
+        transform(build, "a.md", '<a href="foo.md">x</a>')
+        self.assertEqual(self.broken(build), [])
+
+    def test_external_and_anchor_links_are_not_recorded(self) -> None:
+        build = make_build({})
+        content = '<a href="https://x.com">a</a> <a href="#s">b</a> <a href="/p/">c</a>'
+        transform(build, "a.md", content)
+        self.assertEqual(self.broken(build), [])
+
+    def test_misses_accumulate_across_sources(self) -> None:
+        build = make_build({})
+        transform(build, "a.md", '<a href="x.md">x</a>')
+        transform(build, "b.md", '<a href="y.md">y</a>')
+        self.assertEqual({link.source for link in self.broken(build)}, {"a.md", "b.md"})
 
 
 if __name__ == "__main__":

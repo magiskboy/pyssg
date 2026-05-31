@@ -7,6 +7,7 @@ import unittest
 from pyssg.plugin import Plugin
 from pyssg_cli.presets import blog, docs, i18n_blog, i18n_docs, site
 from pyssg_plugins import (
+    BrokenLinks,
     Collections,
     Highlight,
     I18n,
@@ -58,6 +59,16 @@ class PresetShapeTest(unittest.TestCase):
         stack = blog(page_size=3)
         listings = [p for p in stack if isinstance(p, Listing)]
         self.assertTrue(listings)
+
+    def test_broken_links_flag_adds_plugin(self) -> None:
+        self.assertNotIn(BrokenLinks, types_in(docs()))
+        self.assertIn(BrokenLinks, types_in(docs(broken_links=True)))
+
+    def test_strict_links_flag_enables_strict_plugin(self) -> None:
+        stack = blog(strict_links=True)
+        plugins = [p for p in stack if isinstance(p, BrokenLinks)]
+        self.assertEqual(len(plugins), 1)
+        self.assertTrue(plugins[0]._strict)
 
     def test_markdown_pages_flag_adds_plugin(self) -> None:
         for preset in (docs, blog, site):
