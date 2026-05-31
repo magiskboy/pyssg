@@ -19,8 +19,10 @@ classifiers = [
     "Topic :: Text Processing :: Markup :: Markdown",
 ]
 # The kernel is dependency-free (stdlib only). Built-in plugins that need third
-# party libraries declare them as optional extras below.
-dependencies = []
+# party libraries declare them as optional extras below. The exception is
+# python-slugify: Unicode-aware slug generation is needed by the always-on
+# Permalink/Listing plugins, so it ships as a base dependency.
+dependencies = ["python-slugify>=8.0"]
 
 [project.optional-dependencies]
 # Built-in content plugins: Markdown (python-markdown), Template (jinja2) and
@@ -69,6 +71,7 @@ dev = [
  "jinja2>=3.1",
  "types-pyyaml>=6.0.12.20260518",
  "pygments>=2.17",
+ "types-python-slugify>=8.0",
 ]
 
 [tool.mypy]

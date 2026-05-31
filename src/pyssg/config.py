@@ -24,6 +24,10 @@ class Config:
     out: Path
     plugins: list[Plugin] = field(default_factory=list)
     options: dict[str, object] = field(default_factory=dict)
+    # Optional override for URL slug generation. When None, plugins use the
+    # built-in Unicode-aware slugify. A custom callable receives the raw text
+    # and must return the slug (e.g. to enforce a project-specific transliteration).
+    slugify: Callable[[str], str] | None = None
 
     def __post_init__(self) -> None:
         self.src = Path(self.src)

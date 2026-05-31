@@ -26,7 +26,10 @@ This applies only to the path-derived URL; an explicit ``permalink`` or
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from pathlib import Path
+
+from slugify import slugify as _slugify
 
 from pyssg.build import Build
 from pyssg.builder import Builder
@@ -43,7 +46,6 @@ from pyssg.models import Source
 # Permalink runs before Collections (-100), Listing (0) and Navigation (100).
 _COLLECT_STAGE = -200
 
-_SLUG_STRIP = re.compile(r"[^a-z0-9]+")
 _TOKEN = re.compile(r":([a-zA-Z_][a-zA-Z0-9_]*)")
 
 
@@ -56,10 +58,11 @@ class Permalink:
         builder.hooks.collect.tap("Permalink", self._collect, stage=_COLLECT_STAGE)
 
     def _collect(self, build: Build) -> None:
+        slug_fn = resolve_slugify(build)
         for source in build.sources:
-            self._assign(source)
+            self._assign(source, slug_fn)
 
-    def _assign(self, source: Source) -> None:
+    def _assign(self, source: Source, slug_fn: Callable[[str], str]) -> None:
         # A page may already have a URL assigned (e.g. a synthetic listing page);
         # do not override it.
         if URL in source.meta:
@@ -67,9 +70,9 @@ class Permalink:
 
         explicit = source.frontmatter.get("permalink")
         if isinstance(explicit, str):
-            url = _normalize_url(_apply_pattern(explicit, source))
+            url = _normalize_url(_apply_pattern(explicit, source, slug_fn))
         elif self._pattern is not None and not is_generated(source):
-            url = _normalize_url(_apply_pattern(self._pattern, source))
+            url = _normalize_url(_apply_pattern(self._pattern, source, slug_fn))
         else:
             url = _default_url(source.relpath, self._pretty)
             url = _strip_locale_prefix(url, source)
@@ -79,7 +82,22 @@ class Permalink:
 
 
 def slugify(text: str) -> str:
-    return _SLUG_STRIP.sub("-", text.strip().lower()).strip("-")
+    """Unicode-aware slug: transliterate to ASCII and join words with hyphens.
+
+    ``"Lập trình bất đồng bộ"`` -> ``"lap-trinh-bat-dong-bo"``. Handles every
+    Unicode script python-slugify can transliterate (Vietnamese, German, CJK,
+    Cyrillic, ...). A site can override slug generation via ``Config.slugify``;
+    see :func:`resolve_slugify`.
+    """
+
+    return _slugify(text)
+
+
+def resolve_slugify(build: Build) -> Callable[[str], str]:
+    """Return the slug function for this build: ``Config.slugify`` or the default."""
+
+    override = build.config.slugify
+    return override if override is not None else slugify
 
 
 def _strip_locale_prefix(url: str, source: Source) -> str:
@@ -102,20 +120,20 @@ def _strip_locale_prefix(url: str, source: Source) -> str:
     return url
 
 
-def _apply_pattern(pattern: str, source: Source) -> str:
-    tokens = _tokens(source)
+def _apply_pattern(pattern: str, source: Source, slug_fn: Callable[[str], str]) -> str:
+    tokens = _tokens(source, slug_fn)
 
     def replace(match: re.Match[str]) -> str:
         key = match.group(1)
         if key in tokens:
             return tokens[key]
         value = source.frontmatter.get(key)
-        return slugify(str(value)) if value is not None else match.group(0)
+        return slug_fn(str(value)) if value is not None else match.group(0)
 
     return _TOKEN.sub(replace, pattern)
 
 
-def _tokens(source: Source) -> dict[str, str]:
+def _tokens(source: Source, slug_fn: Callable[[str], str]) -> dict[str, str]:
     stem = source.relpath.stem
     slug_value = source.frontmatter.get("slug")
     slug = str(slug_value) if isinstance(slug_value, str) else stem
@@ -123,7 +141,7 @@ def _tokens(source: Source) -> dict[str, str]:
     title = source.frontmatter.get("title")
     tokens = {
         "slug": slug,
-        "title": slugify(str(title)) if title is not None else slug,
+        "title": slug_fn(str(title)) if title is not None else slug,
     }
 
     year, month, day = _date_parts(source.frontmatter.get("date"))

@@ -41,7 +41,7 @@ from pyssg.content import (
 )
 from pyssg.models import Source
 from pyssg_plugins.collections import sort_pages
-from pyssg_plugins.permalink import slugify
+from pyssg_plugins.permalink import resolve_slugify
 
 # Listing runs after Collections (-100) and before Navigation (100).
 _COLLECT_STAGE = 0
@@ -88,7 +88,7 @@ class Listing:
         if self._sort is not None:
             pages = sort_pages(pages, self._sort)
 
-        slug = slugify(collection.name)
+        slug = resolve_slugify(build)(collection.name)
         locale = collection.meta.get(LOCALE)
         locale = str(locale) if locale is not None else None
         # The default locale renders at the root: drop the :locale token even

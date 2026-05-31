@@ -34,6 +34,7 @@ def config() -> Config:
 | `out` | path | Directory the built site is written to. |
 | `plugins` | list | Plugin instances, applied in order. |
 | `options` | dict | Site-wide values exposed to templates as `site`. |
+| `slugify` | callable | Optional override for URL slug generation. |
 
 `src` and `out` accept strings or `Path` objects.
 
@@ -49,6 +50,28 @@ Config(..., options={"title": "Docs", "author": "Jane"})
 <title>{{ site.title }}</title>
 <meta name="author" content="{{ site.author }}">
 ```
+
+## Custom slug generation
+
+Slugs turn a title or collection name into a URL segment. The built-in slugify is
+Unicode-aware: it transliterates to ASCII before joining words with hyphens, so
+`Lập trình bất đồng bộ` becomes `lap-trinh-bat-dong-bo` (Vietnamese, German, CJK,
+Cyrillic and more are all handled). It is used by the Permalink (`:slug`,
+`:title`, `:<key>` placeholders) and Listing plugins.
+
+To enforce a project-specific rule, set `slugify` to any `(str) -> str` callable:
+
+```python
+def my_slugify(text: str) -> str:
+    return text.strip().lower().replace(" ", "_")
+
+
+def config() -> Config:
+    return Config(src="content", out="public", plugins=..., slugify=my_slugify)
+```
+
+The override applies to page URLs and listing slugs. Wikilink heading anchors
+keep the default slugify so they stay aligned with the rendered heading ids.
 
 ## Choosing plugins
 
