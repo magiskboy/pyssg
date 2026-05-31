@@ -14,11 +14,14 @@ from pyssg_plugins import (
     Listing,
     Markdown,
     MarkdownPage,
+    Minify,
     Navigation,
     Permalink,
     ReadFile,
     Redirects,
+    Robots,
     Rss,
+    Sitemap,
     WriteFile,
 )
 
@@ -59,6 +62,12 @@ class PresetShapeTest(unittest.TestCase):
         stack = blog(page_size=3)
         listings = [p for p in stack if isinstance(p, Listing)]
         self.assertTrue(listings)
+
+    def test_extras_flags_wire_their_plugins(self) -> None:
+        stack = docs(sitemap=True, robots=True, markdown_pages=True, minify=True)
+        types = types_in(stack)
+        for plugin_type in (Sitemap, Robots, MarkdownPage, Minify):
+            self.assertIn(plugin_type, types)
 
     def test_broken_links_flag_adds_plugin(self) -> None:
         self.assertNotIn(BrokenLinks, types_in(docs()))
