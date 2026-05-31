@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-05-31
+
 ### Changed
 
 - **BREAKING (i18n):** the default locale now renders at the site root instead
@@ -17,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   parameter of `i18n_blog`/`i18n_docs` is gone. The I18n plugin sets
   `meta["locale_prefix"]` (`""` for the default locale) for templates that build
   locale-aware links.
+
+### Fixed
+
+- Per-locale index listings (e.g. `/` and `/en/`) now share one
+  `translation_key`, so the home page gets a language switcher across locales.
 
 ## [1.0.0] - 2026-05-31
 
@@ -50,5 +57,6 @@ semantic versioning.
 - Distributed as a git-installable package with wheel and sdist attached to each
   GitHub Release.
 
-[Unreleased]: https://github.com/magiskboy/pyssg/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/magiskboy/pyssg/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/magiskboy/pyssg/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/magiskboy/pyssg/releases/tag/v1.0.0
