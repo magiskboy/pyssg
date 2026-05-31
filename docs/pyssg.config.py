@@ -28,7 +28,7 @@ def config() -> Config:
             "title": "pyssg",
             "tagline": "A tiny-kernel, plugin-driven static site generator",
             "repo_url": "https://github.com/magiskboy/pyssg",
-            "base_url": "https://pyssg.example.com",
+            "base_url": "https://pyssg.nkthanh.dev",
         },
         plugins=plugins,
     )
