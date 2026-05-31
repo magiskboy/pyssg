@@ -1,6 +1,7 @@
 # pyssg
 
 [![CI](https://github.com/magiskboy/pyssg/actions/workflows/ci.yml/badge.svg)](https://github.com/magiskboy/pyssg/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-%E2%89%A585%25-brightgreen.svg)](.github/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.13+](https://img.shields.io/badge/python-3.13%2B-blue.svg)](https://www.python.org/downloads/)
 

@@ -9,6 +9,12 @@ wheels/
 # Virtual environments
 .venv
 
+# Coverage artifacts
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
 # Build output
 docs/public/
 .claude

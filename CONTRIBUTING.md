@@ -37,6 +37,14 @@ mypy                          # strict type checking
 python -m unittest discover -s tests
 ```
 
+CI also measures branch coverage and fails below 85%. To check locally before
+pushing (the threshold lives in `pyproject.toml`, so the gate matches CI):
+
+```bash
+coverage run --branch -m unittest discover -s tests
+coverage report -m             # per-file table with missing lines
+```
+
 ## Conventions
 
 - **Python 3.13** with strict typing. `mypy` runs in `strict` mode; do not add

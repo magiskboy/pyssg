@@ -58,6 +58,46 @@ jobs:
       - name: unittest
         run: uv run python -m unittest discover -s tests -v
 
+  coverage:
+    name: Coverage (ubuntu, fail-under 85%)
+    runs-on: ubuntu-latest
+    # Allow the action to post/update the sticky coverage comment on the PR.
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+          enable-cache: true
+      - run: uv sync --all-extras
+      - name: Run tests under coverage
+        run: uv run coverage run --branch -m unittest discover -s tests
+      # Post the report as a sticky PR comment with per-file numbers and inline
+      # annotations on lines the PR leaves uncovered. Self-contained: uses only
+      # GITHUB_TOKEN, no third-party service. Reads the .coverage file produced
+      # above (relative_files = true in pyproject keeps paths portable). Skipped
+      # for fork PRs, whose token is read-only and cannot comment.
+      - name: Coverage comment
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        uses: py-cov-action/python-coverage-comment-action@v3
+        with:
+          GITHUB_TOKEN: ${{ github.token }}
+          MINIMUM_GREEN: 90
+          MINIMUM_ORANGE: 85
+      # Enforce the threshold: `coverage report` exits non-zero below fail_under
+      # (set in pyproject.toml), so this step is the gate. Runs last so the
+      # comment posts even when coverage falls below the gate. The table is also
+      # mirrored into the run summary for at-a-glance review.
+      - name: Coverage report (gate via fail_under)
+        run: |
+          {
+            echo '### Coverage report'
+            echo '```'
+            uv run coverage report
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
   package:
     name: Build and smoke test (git-install channel)
     runs-on: ubuntu-latest
