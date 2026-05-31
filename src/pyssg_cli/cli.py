@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
 from pyssg.builder import Builder
@@ -97,8 +98,23 @@ def _print_next_steps(result: ScaffoldResult) -> None:
     print("  pyssg serve")
 
 
+def _package_version() -> str:
+    # Single source of truth: read the installed distribution metadata rather
+    # than hardcoding a string that could drift from pyproject.toml. Falls back
+    # gracefully when running from an uninstalled source checkout.
+    try:
+        return version("pyssg")
+    except PackageNotFoundError:
+        return "0+unknown"
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="pyssg", description="Static Site Generator")
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {_package_version()}",
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     build_parser = subparsers.add_parser("build", help="Build the site once")

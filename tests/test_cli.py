@@ -10,7 +10,7 @@ from __future__ import annotations
 import io
 import tempfile
 import unittest
-from contextlib import redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 
 from pyssg_cli import cli
@@ -47,6 +47,20 @@ class MissingConfigTest(unittest.TestCase):
             self.assertIn("Build failed", err)
             self.assertIn("Config file not found", err)
             self.assertNotIn("Traceback (most recent call last)", err)
+
+
+class VersionTest(unittest.TestCase):
+    def test_version_prints_and_exits_zero(self) -> None:
+        # `--version` uses argparse's version action, which prints to stdout and
+        # raises SystemExit(0) before any subcommand is required.
+        buffer = io.StringIO()
+        with redirect_stdout(buffer), self.assertRaises(SystemExit) as caught:
+            cli.main(["--version"])
+        self.assertEqual(caught.exception.code, 0)
+        output = buffer.getvalue()
+        self.assertTrue(output.startswith("pyssg "))
+        # The version comes from installed metadata, not a hardcoded fallback.
+        self.assertNotIn("0+unknown", output)
 
 
 if __name__ == "__main__":

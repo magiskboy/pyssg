@@ -36,7 +36,7 @@ pyssg installs directly from GitHub. Most sites want the `plugins` extra
 uv add "pyssg[plugins] @ git+https://github.com/magiskboy/pyssg.git"
 
 # pin to a released version
-uv add "pyssg[plugins] @ git+https://github.com/magiskboy/pyssg.git@v0.1.0"
+uv add "pyssg[plugins] @ git+https://github.com/magiskboy/pyssg.git@v1.0.0"
 
 # pip
 pip install "pyssg[plugins] @ git+https://github.com/magiskboy/pyssg.git"

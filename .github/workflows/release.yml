@@ -2,7 +2,7 @@ name: Release
 
 # pyssg is not published to PyPI; releases are git tags with the built wheel and
 # sdist attached so users can pin or download a specific version. Cut a release
-# by pushing a tag: `git tag v0.1.0 && git push origin v0.1.0`.
+# by pushing a tag: `git tag v1.0.0 && git push origin v1.0.0`.
 on:
   push:
     tags: ["v*"]
@@ -18,10 +18,48 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.13"
+
+      # Guard: the tag (vX.Y.Z) must match the version in pyproject.toml so a
+      # release can never ship artifacts whose metadata disagrees with the tag.
+      - name: Verify tag matches pyproject version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(uv run python -c 'import tomllib,pathlib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')"
+          echo "Tag version: $tag"
+          echo "Package version: $pkg"
+          if [ "$tag" != "$pkg" ]; then
+            echo "::error::Tag '$tag' does not match pyproject version '$pkg'"
+            exit 1
+          fi
+
       - name: Build wheel and sdist
         run: uv build
+
+      # Smoke test the built wheel in a clean environment before publishing, so a
+      # broken artifact never reaches a Release. Mirrors the CI `package` job.
+      - name: Smoke test the built wheel
+        run: |
+          wheel=$(ls dist/*.whl)
+          uv venv /tmp/smoke
+          uv pip install --python /tmp/smoke "pyssg[plugins] @ ${wheel}"
+          /tmp/smoke/bin/pyssg --version
+          /tmp/smoke/bin/pyssg new site --theme docs
+          (cd site && /tmp/smoke/bin/pyssg build)
+          test -f site/public/index.html
+
+      # Tags like v1.1.0-rc1 / v1.1.0-beta1 are published as pre-releases.
+      - name: Detect pre-release
+        id: prerelease
+        run: |
+          if echo "${GITHUB_REF_NAME}" | grep -Eq '\-(rc|alpha|beta)'; then
+            echo "value=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
+          prerelease: ${{ steps.prerelease.outputs.value }}
           files: dist/*
