@@ -352,9 +352,7 @@ def _table(headers: tuple[str, ...], rows: list[tuple[str, ...]]) -> str:
     whole thing as one raw-HTML block and passes it through untouched.
     """
     head = "".join(f"<th>{html.escape(h)}</th>" for h in headers)
-    body = "".join(
-        "<tr>" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>" for row in rows
-    )
+    body = "".join("<tr>" + "".join(f"<td>{cell}</td>" for cell in row) + "</tr>" for row in rows)
     return f"<table>\n<thead><tr>{head}</tr></thead>\n<tbody>{body}</tbody>\n</table>"
 
 

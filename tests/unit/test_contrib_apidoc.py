@@ -57,8 +57,10 @@ class GoogleParserTest(unittest.TestCase):
             "    ValueError: If empty.\n"
         )
         self.assertEqual(doc.summary, "Summary line.")
-        self.assertEqual([(p.name, p.type, p.description) for p in doc.params],
-                         [("name", "str", "Who to greet."), ("loud", "", "Shout it.")])
+        self.assertEqual(
+            [(p.name, p.type, p.description) for p in doc.params],
+            [("name", "str", "Who to greet."), ("loud", "", "Shout it.")],
+        )
         self.assertEqual(doc.returns[0].type, "str")
         self.assertEqual(doc.returns[0].description, "The greeting.")
         self.assertEqual(doc.raises[0].name, "ValueError")
@@ -79,8 +81,9 @@ class NumpyParserTest(unittest.TestCase):
             "float\n    The result.\n"
         )
         self.assertEqual(doc.summary, "Clamp.")
-        self.assertEqual([(p.name, p.type) for p in doc.params],
-                         [("value", "float"), ("low", "float")])
+        self.assertEqual(
+            [(p.name, p.type) for p in doc.params], [("value", "float"), ("low", "float")]
+        )
         self.assertEqual(doc.returns[0].type, "float")
         self.assertEqual(doc.returns[0].description, "The result.")
 
@@ -96,12 +99,15 @@ class RestParserTest(unittest.TestCase):
             ":raises IOError: On failure.\n"
         )
         self.assertEqual(doc.summary, "Read.")
-        self.assertEqual((doc.params[0].name, doc.params[0].type, doc.params[0].description),
-                         ("count", "int", "How many."))
+        self.assertEqual(
+            (doc.params[0].name, doc.params[0].type, doc.params[0].description),
+            ("count", "int", "How many."),
+        )
         self.assertEqual(doc.returns[0].type, "list")
         self.assertEqual(doc.returns[0].description, "The records.")
-        self.assertEqual((doc.raises[0].name, doc.raises[0].description),
-                         ("IOError", "On failure."))
+        self.assertEqual(
+            (doc.raises[0].name, doc.raises[0].description), ("IOError", "On failure.")
+        )
 
 
 class RenderTest(unittest.TestCase):
@@ -111,7 +117,7 @@ class RenderTest(unittest.TestCase):
         self.assertIn("<code>x</code>", md)
         self.assertIn("<code>int</code>", md)
         # No blank line inside the table block (so CommonMark keeps it raw HTML).
-        table = md[md.index("<table>"):md.index("</table>")]
+        table = md[md.index("<table>") : md.index("</table>")]
         self.assertNotIn("\n\n", table)
 
     def test_html_is_escaped(self) -> None:
@@ -130,8 +136,13 @@ class ExtractPackageTest(unittest.TestCase):
         names = [name for name, _ in extract_package(_FIXTURE)]
         self.assertEqual(
             names,
-            ["apidoc_pkg", "apidoc_pkg.io_utils", "apidoc_pkg.mathx",
-             "apidoc_pkg.sub", "apidoc_pkg.sub.helpers"],
+            [
+                "apidoc_pkg",
+                "apidoc_pkg.io_utils",
+                "apidoc_pkg.mathx",
+                "apidoc_pkg.sub",
+                "apidoc_pkg.sub.helpers",
+            ],
         )
         self.assertNotIn("apidoc_pkg._private", names)
 

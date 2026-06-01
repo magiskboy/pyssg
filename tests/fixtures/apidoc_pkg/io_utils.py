@@ -10,7 +10,7 @@ class Reader:
     :type source: str
     """
 
-    def read(self, count):
+    def read(self, count: int) -> list[str]:
         """Read ``count`` records.
 
         :param count: How many records to read.
@@ -20,6 +20,6 @@ class Reader:
         """
         raise NotImplementedError
 
-    async def aclose(self):
+    async def aclose(self) -> None:
         """Close the reader asynchronously."""
         raise NotImplementedError
