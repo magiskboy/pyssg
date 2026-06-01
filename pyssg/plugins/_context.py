@@ -16,6 +16,8 @@ from pyssg.core.node import Document
 from pyssg.core.types import ConnectionKind
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from pyssg.core.build import Build
     from pyssg.core.node import Page
 
@@ -57,6 +59,36 @@ def _default_locale(build: Build) -> str:
     """The default locale code (empty when the i18n plugin is not loaded)."""
     value = _i18n_data(build).get("default_locale")
     return str(value) if isinstance(value, str) else ""
+
+
+def make_translator(
+    strings: dict[str, dict[str, str]], lang: str, default_locale: str
+) -> Callable[..., str]:
+    """Build the ``t(key, **vars)`` callable templates use to localise UI strings.
+
+    Lookup falls back ``lang -> default_locale -> key`` so a missing translation
+    degrades to the default language and finally to the key itself (visible, easy
+    to spot). ``**vars`` are interpolated with :meth:`str.format`; a malformed
+    template or missing variable falls back to the raw string rather than raising,
+    keeping a render robust against an incomplete translation table.
+    """
+    lang_table = strings.get(lang, {})
+    default_table = strings.get(default_locale, {})
+
+    def t(key: str, **fmt: object) -> str:
+        value = lang_table.get(key)
+        if value is None:
+            value = default_table.get(key)
+        if value is None:
+            return key
+        if fmt:
+            try:
+                return value.format(**fmt)
+            except (KeyError, IndexError, ValueError):
+                return value
+        return value
+
+    return t
 
 
 def _page_i18n(build: Build, page: Page) -> tuple[str, list[object]]:

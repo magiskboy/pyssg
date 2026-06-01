@@ -1,0 +1,30 @@
+# Book layout UI strings, Vietnamese. Keys absent here fall back to en.toml.
+# Section headings follow the Vietnamese Diataxis convention.
+
+[section]
+tutorial = "Hướng dẫn"
+how-to = "Cách làm"
+reference = "Tra cứu"
+explanation = "Giải thích"
+references = "Tài liệu API"
+
+[nav]
+previous = "Trước"
+next = "Tiếp"
+
+[post]
+reading_time = "{minutes} phút đọc"
+
+[page]
+on_this_page = "Trên trang này"
+linked_from = "Được liên kết từ"
+
+[term]
+tagged = "{count} trang được gắn thẻ."
+
+[theme]
+toggle = "Đổi giao diện màu"
+aria_prefix = "Giao diện màu: "
+auto = "Tự động"
+light = "Sáng"
+dark = "Tối"

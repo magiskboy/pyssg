@@ -26,7 +26,8 @@ This is a built-in plugin and uses the standard library only.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+import tomllib
+from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING
 
 from pyssg.core.errors import ConfigError
@@ -34,6 +35,8 @@ from pyssg.core.node import Document, Page
 from pyssg.core.types import NodeKind
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from pyssg.core.build import Build
     from pyssg.core.builder import Builder
     from pyssg.core.node import Node
@@ -141,6 +144,72 @@ def build_i18n_data(build: Build, default_locale: str, locales: frozenset[str]) 
         "languages": sorted(locales),
         "by_url": by_url,
     }
+
+
+def _flatten(prefix: str, table: Mapping[str, object], out: dict[str, str]) -> None:
+    """Flatten a nested TOML table into dotted keys (``[nav] home`` -> ``nav.home``).
+
+    Leaf values are coerced to ``str`` -- translation values are strings, and a
+    stray non-string in a table should surface as its text rather than crash.
+    """
+    for key, value in table.items():
+        dotted = f"{prefix}{key}"
+        if isinstance(value, dict):
+            _flatten(f"{dotted}.", value, out)
+        else:
+            out[dotted] = str(value)
+
+
+def discover_locales(*dirs: Path | None) -> frozenset[str]:
+    """Locale codes for which a ``<lang>.toml`` table exists in any of ``dirs``.
+
+    UI-string tables are discovered from disk rather than tied to the i18n
+    routing plugin's configured locales, so a single-language site (no i18n
+    plugin) still gets its theme's strings. The result is sorted-deterministic
+    via the set; callers that need order should sort.
+    """
+    found: set[str] = set()
+    for base in dirs:
+        if base is None or not base.is_dir():
+            continue
+        for path in base.glob("*.toml"):
+            found.add(path.stem)
+    return frozenset(found)
+
+
+def load_strings(
+    theme_i18n_dir: Path | None,
+    site_i18n_dir: Path | None,
+    locales: frozenset[str],
+) -> dict[str, dict[str, str]]:
+    """Load and merge UI-string translation tables for the given locales.
+
+    For each locale ``<lang>`` two optional files are read and merged, the site's
+    table overriding the theme's per key::
+
+        <theme>/i18n/<lang>.toml   (theme default strings)
+        <site>/i18n/<lang>.toml    (site override)
+
+    Tables are flattened to dotted keys. Locales with no table on disk are simply
+    absent from the result. Pure given its path inputs: reading the same files
+    twice yields the same mapping, so it preserves the build-twice invariant; the
+    render cache folds a digest of these strings so editing a table busts it.
+    """
+    out: dict[str, dict[str, str]] = {}
+    for lang in sorted(locales):
+        merged: dict[str, str] = {}
+        # Theme first, site second: later writes win, so the site overrides.
+        for base in (theme_i18n_dir, site_i18n_dir):
+            if base is None:
+                continue
+            path = base / f"{lang}.toml"
+            if not path.is_file():
+                continue
+            with path.open("rb") as fp:
+                _flatten("", tomllib.load(fp), merged)
+        if merged:
+            out[lang] = merged
+    return out
 
 
 class I18nPlugin:

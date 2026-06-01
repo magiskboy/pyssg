@@ -7,7 +7,7 @@
 <h1>{{ page.title }}</h1>
 <p class="post-meta">
 {% if post_date %}<time datetime="{{ post_date }}">{{ post_date }}</time>{% endif %}
-{% if reading_time %}<span class="reading-time">{{ reading_time }} min read</span>{% endif %}
+{% if reading_time %}<span class="reading-time">{{ t("post.reading_time", minutes=reading_time) }}</span>{% endif %}
 </p>
 </header>
 {{ content_html }}

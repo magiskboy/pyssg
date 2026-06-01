@@ -5,9 +5,9 @@
 </nav>
 <article>
 <h1>{{ page.title }}</h1>
-{% if reading_time %}<p class="reading-time">{{ reading_time }} min read</p>{% endif %}
+{% if reading_time %}<p class="reading-time">{{ t("post.reading_time", minutes=reading_time) }}</p>{% endif %}
 {% if toc %}
-<details class="toc"><summary>On this page</summary>
+<details class="toc"><summary>{{ t("page.on_this_page") }}</summary>
 <ul>{% for h in toc %}<li class="toc-l{{ h.level }}"><a href="#{{ h.slug }}">{{ h.text }}</a></li>{% endfor %}</ul>
 </details>
 {% endif %}
@@ -19,7 +19,7 @@
 {% if next %}<a class="next" href="{{ next.url }}">{{ next.title }} &rarr;</a>{% endif %}
 </nav>
 {% if backlinks %}
-<aside class="backlinks"><h3>Linked from</h3>
+<aside class="backlinks"><h3>{{ t("page.linked_from") }}</h3>
 <ul>{% for b in backlinks %}<li><a href="{{ b.url }}">{{ b.title }}</a></li>{% endfor %}</ul>
 </aside>
 {% endif %}

@@ -1,0 +1,31 @@
+# Book layout UI strings (base language). Section keys map a content directory
+# name to its sidebar heading; the en values match the previous auto-humanized
+# labels so the English site is unchanged.
+
+[section]
+tutorial = "Tutorial"
+how-to = "How To"
+reference = "Reference"
+explanation = "Explanation"
+references = "References"
+
+[nav]
+previous = "Previous"
+next = "Next"
+
+[post]
+reading_time = "{minutes} min read"
+
+[page]
+on_this_page = "On this page"
+linked_from = "Linked from"
+
+[term]
+tagged = "{count} page(s) tagged."
+
+[theme]
+toggle = "Toggle color theme"
+aria_prefix = "Color theme: "
+auto = "Auto"
+light = "Light"
+dark = "Dark"

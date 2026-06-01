@@ -1,0 +1,17 @@
+# Docs theme UI strings (base language). A site can override any key by shipping
+# its own i18n/<lang>.toml at the site root.
+
+[nav]
+home = "Home"
+tags = "Tags"
+categories = "Categories"
+
+[post]
+reading_time = "{minutes} min read"
+
+[term]
+tagged = "{count} page(s) tagged."
+
+[page]
+on_this_page = "On this page"
+linked_from = "Linked from"

@@ -1,0 +1,17 @@
+# Blog theme UI strings (base language). A site can override any key by shipping
+# its own i18n/<lang>.toml at the site root.
+
+[nav]
+home = "Home"
+tags = "Tags"
+
+[post]
+reading_time = "{minutes} min read"
+
+[term]
+tagged = "{count} post(s) tagged."
+
+[pagination]
+newer = "Newer"
+older = "Older"
+page_of = "Page {current} of {total}"

@@ -1,0 +1,16 @@
+# Docs theme UI strings, Vietnamese. Keys absent here fall back to en.toml.
+
+[nav]
+home = "Trang chủ"
+tags = "Thẻ"
+categories = "Chuyên mục"
+
+[post]
+reading_time = "{minutes} phút đọc"
+
+[term]
+tagged = "{count} trang được gắn thẻ."
+
+[page]
+on_this_page = "Trên trang này"
+linked_from = "Liên kết từ"

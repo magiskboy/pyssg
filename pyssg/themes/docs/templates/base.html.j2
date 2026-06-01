@@ -10,13 +10,13 @@
 <body>
 <header class="topbar">
 <a href="/" class="brand">{{ site.title }}</a>
-<nav><a href="/tags/">Tags</a> <a href="/categories/">Categories</a>{% for t in translations %} <a class="lang-link" hreflang="{{ t.lang }}" href="{{ t.url }}">{{ t.lang|upper }}</a>{% endfor %}</nav>
+<nav><a href="/tags/">{{ t("nav.tags") }}</a> <a href="/categories/">{{ t("nav.categories") }}</a>{% for t in translations %} <a class="lang-link" hreflang="{{ t.lang }}" href="{{ t.url }}">{{ t.lang|upper }}</a>{% endfor %}</nav>
 </header>
 <div class="layout">
 <aside class="sidebar">
 {% for sec in menu %}
 <div class="nav-section">
-<p class="nav-section-title">{{ sec.section or 'Home' }}</p>
+<p class="nav-section-title">{{ sec.section or t("nav.home") }}</p>
 <ul>{% for item in sec['items'] %}<li><a href="{{ item.url }}">{{ item.title }}</a></li>{% endfor %}</ul>
 </div>
 {% endfor %}

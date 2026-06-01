@@ -10,7 +10,7 @@
 <body>
 <header class="site-header">
 <a href="/" class="site-title">{{ site.title }}</a>
-<nav class="site-nav"><a href="/">Home</a> <a href="/tags/">Tags</a>{% for t in translations %} <a class="lang-link" hreflang="{{ t.lang }}" href="{{ t.url }}">{{ t.lang|upper }}</a>{% endfor %}</nav>
+<nav class="site-nav"><a href="/">{{ t("nav.home") }}</a> <a href="/tags/">{{ t("nav.tags") }}</a>{% for t in translations %} <a class="lang-link" hreflang="{{ t.lang }}" href="{{ t.url }}">{{ t.lang|upper }}</a>{% endfor %}</nav>
 </header>
 <main class="container">
 {% block content %}{% endblock %}

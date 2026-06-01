@@ -16,9 +16,9 @@
 {% set pg = page.get('pagination') %}
 {% if pg and pg.total > 1 %}
 <nav class="pagination">
-{% if pg.prev %}<a class="prev" href="{{ pg.prev }}">&larr; Newer</a>{% endif %}
-<span class="page-indicator">Page {{ pg.current }} of {{ pg.total }}</span>
-{% if pg.next %}<a class="next" href="{{ pg.next }}">Older &rarr;</a>{% endif %}
+{% if pg.prev %}<a class="prev" href="{{ pg.prev }}">&larr; {{ t("pagination.newer") }}</a>{% endif %}
+<span class="page-indicator">{{ t("pagination.page_of", current=pg.current, total=pg.total) }}</span>
+{% if pg.next %}<a class="next" href="{{ pg.next }}">{{ t("pagination.older") }} &rarr;</a>{% endif %}
 </nav>
 {% endif %}
 {% else %}

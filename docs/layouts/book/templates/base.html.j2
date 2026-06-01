@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="/assets/style.css">
 {% if site.highlight_css %}<style>{{ site.highlight_css }}</style>{% endif %}
 {% if site.highlight_css_dark %}<style>{{ site.highlight_css_dark }}</style>{% endif %}
-{% for t in translations %}<link rel="alternate" hreflang="{{ t.lang }}" href="{{ t.url }}">{% endfor %}
+{% for tr in translations %}<link rel="alternate" hreflang="{{ tr.lang }}" href="{{ tr.url }}">{% endfor %}
 </head>
 <body>
 <input type="checkbox" class="hidden-toggle" id="menu-control">
@@ -39,7 +39,7 @@
         {% for key in order %}{% for sec in visible if sec.section == key %}{% set _ = ordered.append(sec) %}{% endfor %}{% endfor %}
         {% for sec in visible if sec.section not in order %}{% set _ = ordered.append(sec) %}{% endfor %}
         {% for sec in ordered %}
-          {% if sec.section %}<p class="book-section-title">{{ sec.section|replace('-', ' ')|replace('_', ' ')|title }}</p>{% endif %}
+          {% if sec.section %}<p class="book-section-title">{{ t("section." + sec.section) }}</p>{% endif %}
           <ul>
             {% for item in sec['items'] %}
             <li><a href="{{ item.url }}"{% if item.url == page.url %} class="active"{% endif %}>{{ item.title|replace('`', '') }}</a></li>
@@ -47,10 +47,11 @@
           </ul>
         {% endfor %}
         <div class="book-menu-footer">
-          {% for t in translations %}<a hreflang="{{ t.lang }}" href="{{ t.url }}">{{ t.lang|upper }}</a>{% endfor %}
-          <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle color theme">
+          {% for tr in translations %}<a hreflang="{{ tr.lang }}" href="{{ tr.url }}">{{ tr.lang|upper }}</a>{% endfor %}
+          <button type="button" id="theme-toggle" class="theme-toggle" aria-label="{{ t('theme.toggle') }}"
+            data-aria-prefix="{{ t('theme.aria_prefix') }}" data-label-auto="{{ t('theme.auto') }}" data-label-light="{{ t('theme.light') }}" data-label-dark="{{ t('theme.dark') }}">
             <svg class="theme-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1 A7 7 0 0 1 8 15 Z" fill="currentColor"/></svg>
-            <span class="theme-label">Auto</span>
+            <span class="theme-label">{{ t('theme.auto') }}</span>
           </button>
         </div>
       </nav>
@@ -72,15 +73,15 @@
       {% block toc %}
       {% if toc %}
       <nav class="toc">
-        <p class="toc-title">On this page</p>
+        <p class="toc-title">{{ t("page.on_this_page") }}</p>
         <ul>
           {% for h in toc %}{% if h.level > 1 %}
           {%- set base = h.text|replace('`', '') -%}
           {%- set stripped = base.startswith('class ') or base.startswith('async ') -%}
-          {%- set t = base[6:] if stripped else base -%}
-          {%- set before = t.split('(')[0] -%}
-          {%- if '(' in t and before and ' ' not in before -%}{%- set label = before -%}
-          {%- elif stripped and t and ' ' not in t -%}{%- set label = t -%}
+          {%- set txt = base[6:] if stripped else base -%}
+          {%- set before = txt.split('(')[0] -%}
+          {%- if '(' in txt and before and ' ' not in before -%}{%- set label = before -%}
+          {%- elif stripped and txt and ' ' not in txt -%}{%- set label = txt -%}
           {%- else -%}{%- set label = base -%}{%- endif -%}
           <li class="toc-l{{ h.level }}"><a href="#{{ h.slug }}">{{ label }}</a></li>{% endif %}{% endfor %}
         </ul>
@@ -98,7 +99,10 @@
   if (!btn) return;
   var label = btn.querySelector(".theme-label");
   var mql = window.matchMedia("(prefers-color-scheme: dark)");
-  var NAMES = { auto: "Auto", light: "Light", dark: "Dark" };
+  var NAMES = {
+    auto: btn.dataset.labelAuto, light: btn.dataset.labelLight, dark: btn.dataset.labelDark,
+  };
+  var ARIA_PREFIX = btn.dataset.ariaPrefix || "";
   function pref() {
     try { return localStorage.getItem("theme") || "auto"; } catch (e) { return "auto"; }
   }
@@ -106,7 +110,7 @@
     var dark = p === "dark" || (p === "auto" && mql.matches);
     document.documentElement.dataset.theme = dark ? "dark" : "light";
     if (label) label.textContent = NAMES[p];
-    btn.setAttribute("aria-label", "Color theme: " + NAMES[p]);
+    btn.setAttribute("aria-label", ARIA_PREFIX + NAMES[p]);
   }
   apply(pref());
   btn.addEventListener("click", function () {
