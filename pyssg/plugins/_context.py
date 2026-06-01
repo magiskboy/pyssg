@@ -1,0 +1,149 @@
+"""Render-context assembly shared by the render plugin.
+
+Builds the template context for a page from the graph and ``build.site_data``
+(filled by the nav/taxonomy plugins during ``evaluate_collections``). Every
+lookup is defensive: a minimal site that loads none of the nav/taxonomy plugins
+still renders (the extra keys are just empty), which keeps the basic pipeline and
+its golden tests working unchanged.
+"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from pyssg.core.incremental.hashing import digest
+from pyssg.core.node import Document
+from pyssg.core.types import ConnectionKind
+
+if TYPE_CHECKING:
+    from pyssg.core.build import Build
+    from pyssg.core.node import Page
+
+# A small ordered/linked record: {"title": ..., "url": ...}.
+type Crumb = dict[str, str]
+
+
+def _public_meta(meta: dict[str, object]) -> dict[str, object]:
+    return {k: v for k, v in meta.items() if not k.startswith("__") and k != "content_html"}
+
+
+def _as_str_list(value: object) -> list[str]:
+    if isinstance(value, str):
+        return [value]
+    if isinstance(value, list):
+        return [str(v) for v in value]
+    return []
+
+
+def _url_titles(build: Build) -> dict[str, str]:
+    raw = build.site_data.get("url_titles")
+    if isinstance(raw, dict):
+        return {str(k): str(v) for k, v in raw.items()}
+    return {}
+
+
+def page_url_of(build: Build, doc_id: str) -> str | None:
+    """URL of the page generated from a document (permalink id convention)."""
+    page = build.graph.get(f"page:{doc_id}")
+    if page is not None and hasattr(page, "url"):
+        return str(page.url)
+    return None
+
+
+def _breadcrumbs(build: Build, page: Page) -> list[Crumb]:
+    titles = _url_titles(build)
+    crumbs: list[Crumb] = [{"title": titles.get("/", "Home"), "url": "/"}]
+    acc = ""
+    for segment in (s for s in page.url.split("/") if s):
+        acc += "/" + segment
+        url = acc + "/"
+        crumbs.append({"title": titles.get(url, segment), "url": url})
+    # Drop the final crumb if it duplicates the current page's own entry.
+    return crumbs
+
+
+def _backlinks(build: Build, doc: Document | None) -> list[Crumb]:
+    if doc is None:
+        return []
+    out: list[Crumb] = []
+    seen: set[str] = set()
+    for conn in build.graph.in_edges(doc.id, ConnectionKind.LINK):
+        if conn.src in seen:
+            continue
+        seen.add(conn.src)
+        src = build.graph.get(conn.src)
+        if src is None:
+            continue
+        title = src.meta.get("title")
+        url = page_url_of(build, conn.src) or "#"
+        out.append({"title": str(title) if title else conn.src, "url": url})
+    return sorted(out, key=lambda b: b["url"])
+
+
+def _prev_next(build: Build, page: Page) -> tuple[Crumb | None, Crumb | None]:
+    ordered = build.site_data.get("ordered_pages")
+    if not isinstance(ordered, list):
+        return None, None
+    urls = [str(item.get("url")) for item in ordered if isinstance(item, dict)]
+    if page.url not in urls:
+        return None, None
+    i = urls.index(page.url)
+    prev = ordered[i - 1] if i > 0 else None
+    nxt = ordered[i + 1] if i + 1 < len(ordered) else None
+    return _crumb(prev), _crumb(nxt)
+
+
+def _crumb(item: object) -> Crumb | None:
+    if isinstance(item, dict):
+        return {"title": str(item.get("title", "")), "url": str(item.get("url", ""))}
+    return None
+
+
+def build_page_context(build: Build, page: Page) -> dict[str, object]:
+    """Assemble the full template context for ``page``."""
+    config = build.builder.config
+    doc = build.graph.get(page.generated_from[0]) if page.generated_from else None
+
+    # A page either renders a source document or is virtual (term/index page),
+    # in which case its own meta carries the data the template needs.
+    source: dict[str, object] = doc.meta if isinstance(doc, Document) else page.meta
+    meta = _public_meta(source)
+    content_html = ""
+    raw_html = source.get("content_html")
+    if isinstance(raw_html, str):
+        content_html = raw_html
+    # The render cache key folds content via this digest instead of the large
+    # html string. A document page reuses the doc's precomputed aspect hash; a
+    # virtual page (sitemap/rss/collection index) carries its payload inline in
+    # ``content_html`` with no source doc, so hash that directly -- otherwise a
+    # summarizer whose body changes but whose other context is unchanged would
+    # be served a stale render from cache.
+    content_digest = (
+        doc.hashes.get("content_html", "")
+        if isinstance(doc, Document)
+        else digest("inline_content_html", content_html)
+    )
+
+    site: dict[str, object] = {}
+    if config is not None:
+        site = {**config.site, "base_url": config.base_url}
+
+    prev, nxt = _prev_next(build, page)
+    doc_typed = doc if isinstance(doc, Document) else None
+    return {
+        "page": {**meta, "url": page.url},
+        "site": site,
+        "content_html": content_html,
+        "__content_digest__": content_digest,
+        "collections": {},
+        "menu": build.site_data.get("menu", []),
+        "all_tags": build.site_data.get("all_tags", []),
+        "breadcrumbs": _breadcrumbs(build, page),
+        "backlinks": _backlinks(build, doc_typed),
+        "toc": meta.get("toc", []),
+        "tags": _as_str_list(meta.get("tags")),
+        "reading_time": meta.get("reading_time"),
+        "excerpt": meta.get("excerpt"),
+        "prev": prev,
+        "next": nxt,
+    }

@@ -56,7 +56,7 @@ jobs:
       # --all-extras pulls watchdog so the DevServer event-based path is exercised.
       - run: uv sync --all-extras
       - name: unittest
-        run: uv run python -m unittest discover -s tests -v
+        run: uv run python -m unittest discover -s tests -t . -v
 
   coverage:
     name: Coverage (ubuntu, fail-under 85%)
@@ -72,7 +72,7 @@ jobs:
           enable-cache: true
       - run: uv sync --all-extras
       - name: Run tests under coverage
-        run: uv run coverage run --branch -m unittest discover -s tests
+        run: uv run coverage run --branch -m unittest discover -s tests -t .
       # Post the report as a sticky PR comment with per-file numbers and inline
       # annotations on lines the PR leaves uncovered. Self-contained: uses only
       # GITHUB_TOKEN, no third-party service. Reads the .coverage file produced
@@ -114,10 +114,10 @@ jobs:
         run: |
           wheel=$(ls dist/*.whl)
           uv venv /tmp/smoke
-          uv pip install --python /tmp/smoke "pyssg[plugins] @ ${wheel}"
-          /tmp/smoke/bin/pyssg new site --theme docs
-          (cd site && /tmp/smoke/bin/pyssg build)
-          test -f site/public/index.html
+          uv pip install --python /tmp/smoke "pyssg @ ${wheel}"
+          /tmp/smoke/bin/pyssg --site site init --preset docs
+          /tmp/smoke/bin/pyssg --site site build
+          test -f site/dist/index.html
       - uses: actions/upload-artifact@v7
         with:
           name: dist

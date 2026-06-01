@@ -9,13 +9,10 @@
 #   CLOUDFLARE_ACCOUNT_ID  the account that owns the Worker
 name: Deploy docs
 
+# NOTE: temporarily disabled. The docs/ site was removed during the rewrite and
+# will be re-authored later; push triggers are paused (manual dispatch only) and
+# the push trigger below should be restored once docs/ exists again.
 on:
-  push:
-    branches: [main]
-    paths:
-      - "docs/**"
-      - "src/**"
-      - ".github/workflows/deploy-docs.yml"
   workflow_dispatch:
 
 # One deploy at a time; newer pushes supersede in-flight runs.

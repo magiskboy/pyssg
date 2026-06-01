@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }} | {{ site.title }}</title>
+<link rel="stylesheet" href="/assets/style.css">
+{% if site.highlight_css %}<style>{{ site.highlight_css }}</style>{% endif %}
+</head>
+<body>
+<header class="topbar">
+<a href="/" class="brand">{{ site.title }}</a>
+<nav><a href="/tags/">Tags</a> <a href="/categories/">Categories</a></nav>
+</header>
+<div class="layout">
+<aside class="sidebar">
+{% for sec in menu %}
+<div class="nav-section">
+<p class="nav-section-title">{{ sec.section or 'Home' }}</p>
+<ul>{% for item in sec['items'] %}<li><a href="{{ item.url }}">{{ item.title }}</a></li>{% endfor %}</ul>
+</div>
+{% endfor %}
+</aside>
+<main class="content">
+{% block content %}{% endblock %}
+</main>
+</div>
+{% if '<pre class="mermaid"' in content_html %}
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+mermaid.initialize({ startOnLoad: true });
+</script>
+{% endif %}
+</body>
+</html>

@@ -41,11 +41,10 @@ jobs:
         run: |
           wheel=$(ls dist/*.whl)
           uv venv /tmp/smoke
-          uv pip install --python /tmp/smoke "pyssg[plugins] @ ${wheel}"
-          /tmp/smoke/bin/pyssg --version
-          /tmp/smoke/bin/pyssg new site --theme docs
-          (cd site && /tmp/smoke/bin/pyssg build)
-          test -f site/public/index.html
+          uv pip install --python /tmp/smoke "pyssg @ ${wheel}"
+          /tmp/smoke/bin/pyssg --site site init --preset docs
+          /tmp/smoke/bin/pyssg --site site build
+          test -f site/dist/index.html
 
       # Tags like v1.1.0-rc1 / v1.1.0-beta1 are published as pre-releases.
       - name: Detect pre-release

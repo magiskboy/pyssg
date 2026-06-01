@@ -1,0 +1,32 @@
+{% extends "base.html.j2" %}
+{% block content %}
+<h1>{{ page.title }}</h1>
+{% set items = page.get('items') %}
+{% if items is not none %}
+{# Collection index page (blog preset): a paginated slice of `posts`. #}
+<div class="post-list">
+{% for post in items %}
+<article class="post-summary">
+<h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+<p class="post-meta">{% if post.date %}<time datetime="{{ post.date }}">{{ post.date }}</time>{% endif %}</p>
+{% if post.excerpt %}<p class="excerpt">{{ post.excerpt }}</p>{% endif %}
+</article>
+{% endfor %}
+</div>
+{% set pg = page.get('pagination') %}
+{% if pg and pg.total > 1 %}
+<nav class="pagination">
+{% if pg.prev %}<a class="prev" href="{{ pg.prev }}">&larr; Newer</a>{% endif %}
+<span class="page-indicator">Page {{ pg.current }} of {{ pg.total }}</span>
+{% if pg.next %}<a class="next" href="{{ pg.next }}">Older &rarr;</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+{# Standalone use (no collection): list pages grouped by section from the nav menu. #}
+<ul class="post-list">
+{% for sec in menu %}{% if sec.section %}{% for item in sec['items'] %}
+<li><a href="{{ item.url }}">{{ item.title }}</a></li>
+{% endfor %}{% endif %}{% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

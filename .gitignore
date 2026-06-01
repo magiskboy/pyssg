@@ -15,6 +15,23 @@ wheels/
 htmlcov/
 coverage.xml
 
-# Build output
-docs/public/
+# Tooling caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# pyssg build artifacts
+.pyssg-cache/
+.report-tmp/
+
+# benchmarks artifacts (charts, JSON, report, scratch sites)
+benchmarks/results/
+benchmarks/.bench-work/
+
+# Example sites are kept locally but not tracked in this repo.
+examples/wiki/
+examples/docs/
+
+# Scratch / working notes
+TRACK.md
 .claude

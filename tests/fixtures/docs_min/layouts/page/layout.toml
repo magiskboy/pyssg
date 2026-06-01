@@ -1,0 +1,3 @@
+name = "page"
+version = "0.1.0"
+default_template = "page.html.j2"

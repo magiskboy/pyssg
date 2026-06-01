@@ -1,0 +1,8 @@
+{% extends "base.html.j2" %}
+{% block content %}
+<h1>{{ page.title }}</h1>
+<p>{{ page.count }} post(s) tagged.</p>
+<ul class="post-list">
+{% for m in page.members %}<li><a href="{{ m.url }}">{{ m.title }}</a></li>{% endfor %}
+</ul>
+{% endblock %}

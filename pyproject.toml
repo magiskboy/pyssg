@@ -1,42 +1,32 @@
 [project]
 name = "pyssg"
-version = "1.1.0"
-description = "Static Site Generator with a webpack-style plugin and lifecycle-hook kernel"
+version = "0.1.0"
+description = "Incremental static site generator for Markdown, with a Webpack-inspired hook + dependency-graph architecture."
 readme = "README.md"
 requires-python = ">=3.13"
-license = "MIT"
-license-files = ["LICENSE"]
+license = { text = "MIT" }
 authors = [{ name = "magiskboy" }]
-keywords = ["static-site-generator", "ssg", "markdown", "jinja2", "plugin", "lifecycle-hook"]
+keywords = ["static-site-generator", "ssg", "markdown", "jinja2", "plugin", "incremental"]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
+    "Development Status :: 3 - Alpha",
     "Environment :: Console",
     "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.13",
     "Topic :: Internet :: WWW/HTTP :: Site Management",
     "Topic :: Software Development :: Libraries :: Application Frameworks",
     "Topic :: Text Processing :: Markup :: Markdown",
 ]
-# The kernel is dependency-free (stdlib only). Built-in plugins that need third
-# party libraries declare them as optional extras below. The exception is
-# python-slugify: Unicode-aware slug generation is needed by the always-on
-# Permalink/Listing plugins, so it ships as a base dependency.
-dependencies = ["python-slugify>=8.0"]
-
-[project.optional-dependencies]
-# Built-in content plugins: Markdown (python-markdown), Template (jinja2) and
-# Frontmatter (pyyaml, for full YAML + precise line/column error marks).
-markdown = ["markdown>=3.6"]
-template = ["jinja2>=3.1"]
-frontmatter = ["pyyaml>=6.0"]
-# Build-time syntax highlighting: Pygments (the Highlight plugin, opt-in).
-highlight = ["pygments>=2.17"]
-# Convenience extra pulling every built-in plugin dependency.
-plugins = ["markdown>=3.6", "jinja2>=3.1", "pyyaml>=6.0", "pygments>=2.17"]
-# DevServer file watching: watchdog (event-based). Optional -- the watch loop
-# falls back to dependency-free mtime polling when watchdog is not installed.
-dev = ["watchdog>=4.0"]
+dependencies = [
+    # Third-party libs live ONLY in peripheral built-in plugins / watch (SPEC 2.2, invariant 1).
+    "markdown-it-py>=3.0",
+    "pyyaml>=6.0",
+    "jinja2>=3.1",
+    "pygments>=2.18",
+    "pillow>=10.4",
+    "watchdog>=4.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/magiskboy/pyssg"
@@ -44,59 +34,56 @@ Repository = "https://github.com/magiskboy/pyssg"
 Issues = "https://github.com/magiskboy/pyssg/issues"
 
 [project.scripts]
-pyssg = "pyssg_cli.cli:main"
+pyssg = "pyssg.cli:main"
+
+[dependency-groups]
+dev = [
+    "matplotlib>=3.9",
+    "mypy>=1.11",
+    "pytest>=8.3",
+    "ruff>=0.6",
+    "coverage>=7.6",
+    "types-pyyaml>=6.0",
+]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-# One wheel ships three import packages with a strict layered dependency:
-# pyssg (kernel, stdlib-only) <- pyssg_plugins (built-ins) <- pyssg_cli (CLI,
-# presets, scaffolding). The boundary is enforced by tests/test_package_layers.py.
-packages = ["src/pyssg", "src/pyssg_plugins", "src/pyssg_cli"]
-# The official themes are the single source of truth under src/pyssg_cli/themes
-# and ship inside the pyssg_cli package, so `pyssg new --theme <name>` works
-# fully offline from an installed package. They are included automatically as
-# package data; no force-include is needed (and adding one duplicates them).
-
-[dependency-groups]
-dev = [
- "mypy>=1.10",
- "ruff>=0.6",
- "pre-commit>=3.7",
- "coverage>=7.6",
- "types-Markdown>=3.6",
- "markdown>=3.6",
- "jinja2>=3.1",
- "types-pyyaml>=6.0.12.20260518",
- "pygments>=2.17",
- "types-python-slugify>=8.0",
-]
+packages = ["pyssg"]
 
 [tool.mypy]
 python_version = "3.13"
 strict = true
-files = ["src", "tests"]
+warn_unreachable = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+files = ["pyssg", "tests", "benchmarks"]
 
-# watchdog is an optional dependency (the "dev" extra) and ships no type stubs;
-# the DevServer watch loop only imports it lazily behind a fallback.
+# Third-party libs without bundled type stubs: ignore missing imports at the boundary only.
 [[tool.mypy.overrides]]
-module = ["watchdog.*"]
+module = ["markdown_it.*", "watchdog.*", "PIL.*", "pygments.*", "matplotlib.*"]
 ignore_missing_imports = true
 
-# Pygments is an optional dependency (the "highlight" extra) without bundled
-# stubs; the Highlight plugin imports it lazily.
-[[tool.mypy.overrides]]
-module = ["pygments.*"]
-ignore_missing_imports = true
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+src = ["pyssg", "tests", "benchmarks"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pyssg"]
 
 # Coverage wraps the stdlib unittest runner; it is a dev-only tool and never a
 # runtime dependency, so the kernel stays dependency-free. The fail_under gate
 # lives here so local `coverage report` and CI enforce the same threshold.
 [tool.coverage.run]
 branch = true
-source = ["src"]
+source = ["pyssg"]
 relative_files = true
 
 [tool.coverage.report]
@@ -108,15 +95,3 @@ exclude_also = [
     "raise NotImplementedError",
     "@(abc\\.)?abstractmethod",
 ]
-
-[tool.pyssg]
-# By default the CLI looks for a config file named "pyssg.config.py" in the cwd.
-
-[tool.ruff]
-target-version = "py313"
-line-length = 88
-src = ["src", "tests"]
-
-[tool.ruff.lint]
-# pycodestyle (E), Pyflakes (F), isort (I), pyupgrade (UP), flake8-bugbear (B).
-select = ["E", "F", "I", "UP", "B"]
