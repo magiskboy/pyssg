@@ -29,7 +29,7 @@ These are the plugins bundled with pyssg and used by the presets.
 | `nav` | Sidebar menu, breadcrumbs, and prev/next. |
 | `taxonomy` | Zero-config `tags` and `categories` index pages. |
 | `collections` | Declarative, paginated lists of documents. |
-| `i18n` | Directory-based locales (see the i18n how-to). |
+| `i18n` | Directory-based locales and UI-string tables (see the [i18n reference](/reference/i18n/)). |
 | `rss` | RSS feed. |
 | `sitemap` | `sitemap.xml`. |
 | `asset_copy` | Copies static assets to the output. |

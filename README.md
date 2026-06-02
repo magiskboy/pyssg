@@ -1,5 +1,7 @@
 # pyssg
 
+![Status: in development](https://img.shields.io/badge/status-in%20development-orange)
+
 A fast, incremental static site generator for Markdown, with a Webpack-inspired
 plugin architecture. Built for **documentation sites**, **blogs**, and large
 **wikis / knowledge bases**.
@@ -7,6 +9,10 @@ plugin architecture. Built for **documentation sites**, **blogs**, and large
 The core (`pyssg.core`) is pure standard library; every third-party dependency
 lives in a peripheral plugin. Builds are deterministic — building twice produces
 byte-identical output.
+
+> **Pre-1.0 and in active development.** The public API, configuration, and
+> built-in themes may still change without notice. If you depend on pyssg, pin a
+> specific commit.
 
 ## Features
 

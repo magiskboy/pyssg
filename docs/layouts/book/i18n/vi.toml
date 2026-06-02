@@ -1,6 +1,9 @@
 # Book layout UI strings, Vietnamese. Keys absent here fall back to en.toml.
 # Section headings follow the Vietnamese Diataxis convention.
 
+[banner]
+dev = "pyssg đang trong giai đoạn phát triển (chưa 1.0) - API, cấu hình và theme có thể thay đổi."
+
 [section]
 tutorial = "Hướng dẫn"
 how-to = "Cách làm"

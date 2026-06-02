@@ -71,6 +71,17 @@ body {
 a { color: var(--color-link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+/* Pre-1.0 status banner: a full-width notice above the layout. Static (scrolls
+   away), amber in both themes for contrast with dark body text. */
+.dev-banner {
+  padding: 0.4rem 1rem;
+  background: #f6b73c;
+  color: #1c1e21;
+  text-align: center;
+  font-size: var(--font-size-smaller);
+  font-weight: 600;
+}
+
 /* ---- Layout ------------------------------------------------------------- */
 
 .container {

@@ -59,7 +59,59 @@ The built-in `docs` and `blog` themes already use them to render `<html lang>`,
 `hreflang` alternates, and a header switcher, so with the layout above you get a
 working bilingual site out of the box.
 
-## 4. Build and check
+## 4. Translate the UI strings
+
+Steps 1-3 localise your *content*. The labels baked into the theme - "Tags",
+"Previous", "On this page" - are translated separately, through **string tables**.
+
+### Where the tables live
+
+Two optional files per locale are merged, the site's overriding the theme's per
+key:
+
+```text
+<layout>/i18n/en.toml    # theme defaults (the built-in themes ship these)
+<layout>/i18n/vi.toml
+i18n/en.toml             # site overrides, relative to the site root
+i18n/vi.toml
+```
+
+The tables are loaded independently of the routing plugin, so even a
+single-language site can use them.
+
+### Write a table
+
+Group keys with TOML tables and address them with dots (`nav.home`). Values may
+contain `{placeholders}`:
+
+```toml
+# i18n/vi.toml
+[nav]
+home = "Trang chủ"
+tags = "Thẻ"
+
+[post]
+reading_time = "{minutes} phút đọc"
+```
+
+### Call `t()` in a template
+
+The render step injects a `t(key, **vars)` function into every template:
+
+```jinja
+<a href="/">{{ t("nav.home") }}</a>
+<span>{{ t("post.reading_time", minutes=reading_time) }}</span>
+```
+
+`t()` resolves the key in the current page's locale, falls back to the default
+locale, and finally returns the key itself - so an untranslated label shows its
+key (easy to spot) instead of breaking the page. The built-in `blog` and `docs`
+themes already route every label through `t()` and ship `en`/`vi` tables, so
+translating them is just a matter of adding or overriding a `.toml` file.
+
+See the [i18n reference](/reference/i18n/) for the exact lookup and merge rules.
+
+## 5. Build and check
 
 ```bash
 pyssg --site my-site build
