@@ -57,12 +57,15 @@ def docs(
     highlight_style: str = "default",
     rss_title: str | None = None,
     extra_plugins: Iterable[Plugin] | None = None,
+    deploy: dict[str, dict[str, object]] | None = None,
 ) -> Config:
     """Build a :class:`Config` for a documentation site.
 
     ``layout`` defaults to the built-in ``docs`` theme; pass a path to override
     it with a site-local layout. ``extra_plugins`` are appended after the
     defaults (so they run last). ``rss_title`` defaults to the site title.
+    ``deploy`` is forwarded verbatim to :attr:`Config.deploy` for the
+    ``pyssg deploy`` subcommand; see the deploy docs for the schema.
     """
     plugins: list[Plugin] = [
         directory_loader(),
@@ -92,4 +95,5 @@ def docs(
         base_url=base_url,
         plugins=plugins,
         site=dict(site) if site is not None else {},
+        deploy=dict(deploy) if deploy is not None else {},
     )

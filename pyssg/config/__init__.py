@@ -66,6 +66,13 @@ class Config:
     authors are encouraged -- not required -- to reuse a few conventional names
     when applicable, e.g. ``default_theme`` ("auto"/"light"/"dark" color scheme)
     and ``accent`` (primary color).
+
+    ``deploy`` holds per-target options for the ``pyssg deploy`` subcommand;
+    keys are target names (``"github-pages"``, ``"cloudflare"``, ``"netlify"``)
+    and values are the option dicts passed to that target. This field is not
+    validated at load time: a site that never deploys does not need to fill it
+    in, and validation runs only when the user actually invokes
+    ``pyssg deploy <target>``.
     """
 
     content_dir: str = "content"
@@ -75,6 +82,7 @@ class Config:
     plugins: list[Plugin] = field(default_factory=list)
     site: dict[str, object] = field(default_factory=dict)
     theme: dict[str, object] = field(default_factory=dict)
+    deploy: dict[str, dict[str, object]] = field(default_factory=dict)
 
 
 def load_config(site_dir: Path) -> Config:

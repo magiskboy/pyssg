@@ -5,6 +5,8 @@
 - ``pyssg serve`` watches + incrementally rebuilds + serves with live reload.
 - ``pyssg clean`` removes the output dir and cache (with confirmation).
 - ``pyssg eject-layout`` copies a built-in theme into the site to customize it.
+- ``pyssg deploy`` pushes the built site to a hosting provider; see
+  :mod:`pyssg.cli.deploy` for the subcommand surface.
 """
 
 from __future__ import annotations
@@ -13,6 +15,7 @@ import argparse
 import shutil
 from pathlib import Path
 
+from pyssg.cli import deploy as deploy_cli
 from pyssg.cli.common import CACHE_DIRNAME, build_site, make_builder, open_cache
 from pyssg.cli.scaffold import PRESETS, eject_layout, init_site, list_themes
 from pyssg.cli.serve import serve
@@ -108,6 +111,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     eject.add_argument("--to", default="layouts/theme", help="destination dir (relative to site)")
 
+    deploy_cli.add_subparser(sub)
+
     args = parser.parse_args(argv)
     if args.command == "init":
         return _cmd_init(args)
@@ -117,4 +122,6 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_serve(args)
     if args.command == "eject-layout":
         return _cmd_eject(args)
+    if args.command == "deploy":
+        return deploy_cli.run(args)
     return _cmd_clean(args)

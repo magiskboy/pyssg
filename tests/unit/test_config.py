@@ -26,6 +26,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(config.base_url, "")
         self.assertEqual(config.plugins, [])
         self.assertEqual(config.site, {})
+        self.assertEqual(config.deploy, {})
 
     def test_config_independent_mutable_defaults(self) -> None:
         """Each Config gets its own plugins list / site dict (no shared state)."""
@@ -33,8 +34,10 @@ class ConfigTest(unittest.TestCase):
         b = Config()
         a.plugins.append(object())  # type: ignore[arg-type]
         a.site["title"] = "A"
+        a.deploy["github-pages"] = {"repo": "x/y"}
         self.assertEqual(b.plugins, [])
         self.assertEqual(b.site, {})
+        self.assertEqual(b.deploy, {})
 
     def test_load_config_returns_exported_config(self) -> None:
         _write_config(

@@ -62,13 +62,15 @@ def blog(
     highlight_style: str = "default",
     rss_title: str | None = None,
     extra_plugins: Iterable[Plugin] | None = None,
+    deploy: dict[str, dict[str, object]] | None = None,
 ) -> Config:
     """Build a :class:`Config` for a blog.
 
     Posts are documents under ``content/<posts_dir>/``; they are collected,
     sorted newest-first by ``date``, and paginated at ``posts_route`` with
     ``posts_per_page`` per page. ``layout`` defaults to the built-in ``blog``
-    theme.
+    theme. ``deploy`` is forwarded verbatim to :attr:`Config.deploy` for the
+    ``pyssg deploy`` subcommand.
     """
     posts = CollectionSpec(
         name="posts",
@@ -108,4 +110,5 @@ def blog(
         base_url=base_url,
         plugins=plugins,
         site=dict(site) if site is not None else {},
+        deploy=dict(deploy) if deploy is not None else {},
     )

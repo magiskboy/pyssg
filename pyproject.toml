@@ -35,6 +35,12 @@ Issues = "https://github.com/magiskboy/pyssg/issues"
 [project.scripts]
 pyssg = "pyssg.cli:main"
 
+[project.optional-dependencies]
+deploy = [
+    "blake3>=0.4",
+    "httpx>=0.27",
+]
+
 [dependency-groups]
 dev = [
     "matplotlib>=3.9",
