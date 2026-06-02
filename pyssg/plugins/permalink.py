@@ -9,6 +9,12 @@ template.
 A ``route`` tap may veto a page by routing it to the empty string: when the
 final URL is ``""`` the generator emits no page. Plugins use this to suppress
 output (e.g. the i18n plugin drops documents outside any locale directory).
+
+Each document page is given a concrete ``template``: the frontmatter ``template``
+if set, otherwise the layout's ``default_template``. This makes ``template=None``
+mean *exactly* "emit the body verbatim, no layout" -- the contract the render
+plugin relies on so summarizer pages (sitemap/rss/llms) stay raw. When there is no
+layout at all, the template stays ``None`` and the render plugin emits raw anyway.
 """
 
 from __future__ import annotations
@@ -48,6 +54,10 @@ class PermalinkPlugin:
     cache_version = "1.0.0"
 
     def apply(self, builder: Builder) -> None:
+        # The default template comes from the resolved layout; without a layout it
+        # stays None and the render plugin emits the body raw.
+        default_template = builder.layout.default_template if builder.layout is not None else None
+
         @builder.hooks.this_compilation.tap(self.name)
         def _wire(build: Build) -> None:
             @build.hooks.generate.tap(self.name)
@@ -59,13 +69,14 @@ class PermalinkPlugin:
                 url = build.hooks.route.call(compute_url(node), node)
                 if not url:
                     return  # a route tap suppressed this page (e.g. i18n: no locale)
+                template = _opt_str(node.meta.get("template")) or default_template
                 build.emit_page(
                     Page(
                         id=f"page:{node.id}",
                         kind=NodeKind.PAGE,
                         url=url,
                         generated_from=[node.id],
-                        template=_opt_str(node.meta.get("template")),
+                        template=template,
                     )
                 )
 

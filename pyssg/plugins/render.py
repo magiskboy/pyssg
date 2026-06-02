@@ -45,7 +45,9 @@ class RenderPlugin:
     """Renders pages through the layout's Jinja2 templates."""
 
     name = "render"
-    cache_version = "1.1.0"
+    # 1.2.0: template=None now emits the body raw (no layout) even when a layout
+    # exists, so previously-wrapped summarizer outputs must be re-rendered.
+    cache_version = "1.2.0"
 
     def apply(self, builder: Builder) -> None:
         layout = builder.layout
@@ -78,10 +80,14 @@ class RenderPlugin:
         context = build_page_context(build, page)
         content_html = str(context.get("content_html", ""))
         layout = build.builder.layout
-        if env is None or layout is None:
+        # ``template is None`` means "emit the body verbatim, no layout": regular
+        # pages are given a concrete template by the permalink plugin, so a None
+        # here is a summarizer page (sitemap/rss/llms). Without a layout/env every
+        # page is emitted raw.
+        if env is None or layout is None or page.template is None:
             return content_html
 
-        template_name = page.template or layout.default_template
+        template_name = page.template
         lang = str(context.get("lang", ""))
         # The i18n routing plugin (when loaded) names the site's default locale;
         # otherwise fall back to the theme base so a single-language site resolves.

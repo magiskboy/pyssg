@@ -18,15 +18,11 @@ Like the sitemap/rss plugins this is a *summarizer fan-in*: it taps
 ``evaluate_collections`` (after nav/taxonomy so every virtual page already
 exists), scans the final graph for document-backed pages, and materializes one or
 two virtual pages carrying the rendered text as ``content_html`` with
-``template=None`` (intended to mean "emit verbatim, no layout"). It reads only
-declared inputs -- page urls, document meta and the Markdown body kept on the node
-(``__body__``), never the clock or the filesystem -- and sorts deterministically,
-so two builds are byte-identical and an incremental rebuild matches a full one.
-
-Known caveat: on a site with a ``layout`` the raw-emit path is currently broken
--- ``template=None`` falls back to the default template and the output is wrapped
-in HTML (shared with sitemap/rss). Tracked in
-https://github.com/magiskboy/pyssg/issues/61.
+``template=None`` (the render contract for "emit verbatim, no layout"). It reads
+only declared inputs -- page urls, document meta and the Markdown body kept on the
+node (``__body__``), never the clock or the filesystem -- and sorts
+deterministically, so two builds are byte-identical and an incremental rebuild
+matches a full one.
 
 Selection: pages are grouped/filtered by *section* (the first URL segment).
 ``include`` keeps only the listed sections (``None`` = all), ``exclude`` drops
