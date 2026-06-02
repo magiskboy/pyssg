@@ -19,7 +19,7 @@ from pyssg.core.errors import ConfigError
 from pyssg.themes import available_themes, theme_path
 
 # Presets that ``init`` knows how to scaffold.
-PRESETS = ("docs", "blog")
+PRESETS = ("docs", "blog", "obsidian")
 
 _DOCS_CONFIG = """\
 from __future__ import annotations
@@ -76,6 +76,39 @@ Welcome to your new blog. Posts live under `content/posts/`; the home page lists
 them newest-first. Edit this file or add more `.md` files alongside it.
 """
 
+_OBSIDIAN_CONFIG = """\
+from __future__ import annotations
+
+from pyssg.presets import obsidian
+
+config = obsidian(
+    site={"title": "My Vault"},
+    base_url="https://example.com",
+)
+"""
+
+_OBSIDIAN_INDEX = """\
+---
+title: Home
+---
+# My Vault
+
+Welcome. Every note is published by default; mark a note `publish: false` to keep
+it private. See [[Getting Started]] to learn more.
+"""
+
+_OBSIDIAN_GETTING_STARTED = """\
+---
+title: Getting Started
+---
+## Getting Started
+
+- Link notes with `[[wikilinks]]`; embed a note with `![[Note]]`.
+- Embed an image with `![[diagram.png]]` (attachments are copied automatically).
+- Mark a note `publish: false` to keep it out of the site.
+- Run `pyssg build` to render, or `pyssg serve` for live preview.
+"""
+
 # Per-preset scaffold: config file plus the content tree (relative path -> body).
 _SCAFFOLDS: dict[str, dict[str, str]] = {
     "docs": {
@@ -86,6 +119,11 @@ _SCAFFOLDS: dict[str, dict[str, str]] = {
     "blog": {
         CONFIG_FILENAME: _BLOG_CONFIG,
         "content/posts/hello-world.md": _BLOG_POST,
+    },
+    "obsidian": {
+        CONFIG_FILENAME: _OBSIDIAN_CONFIG,
+        "content/index.md": _OBSIDIAN_INDEX,
+        "content/Getting Started.md": _OBSIDIAN_GETTING_STARTED,
     },
 }
 

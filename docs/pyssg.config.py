@@ -42,7 +42,15 @@ config = docs(
         # Explicit sidebar section order (by content directory; "" is the home
         # page). The nav plugin emits sections alphabetically, so the theme
         # reorders them using this list; sections not listed fall back to the end.
-        "menu_order": ["", "tutorial", "how-to", "reference", "explanation", "references"],
+        "menu_order": [
+            "",
+            "tutorial",
+            "how-to",
+            "integrations",
+            "reference",
+            "explanation",
+            "references",
+        ],
     },
     base_url="https://pyssg.nkthanh.dev",
     # Custom layout converted from the Hugo "Book" theme (docs/layouts/book).

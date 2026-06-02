@@ -1,0 +1,10 @@
+{
+	"id": "pyssg-publish",
+	"name": "PySSG Publish",
+	"version": "0.1.0",
+	"minAppVersion": "1.5.0",
+	"description": "Build and preview your vault as a static website with PySSG. Publishes notes marked publish: true, resolves wikilinks, embeds and attachments.",
+	"author": "PySSG",
+	"authorUrl": "https://github.com/magiskboy/pyssg",
+	"isDesktopOnly": true
+}

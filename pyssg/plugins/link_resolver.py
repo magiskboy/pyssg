@@ -17,6 +17,7 @@ from __future__ import annotations
 import posixpath
 import re
 from typing import TYPE_CHECKING
+from urllib.parse import unquote
 
 from pyssg.core.dependency import Dependency
 from pyssg.core.node import Document
@@ -33,9 +34,15 @@ _EXTERNAL = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")  # has a URL scheme (http:,
 
 
 def _target_id(linking_source: str, href_path: str) -> str:
-    """Resolve a relative ``.md`` href to a path-based NodeId."""
+    """Resolve a relative ``.md`` href to a path-based NodeId.
+
+    ``href_path`` is percent-decoded first: a Markdown link to a file with spaces
+    or non-ASCII characters (common in Obsidian vaults, e.g. Vietnamese titles) is
+    stored URL-encoded in the source, but node ids use the real on-disk path, so
+    the two only match once the href is decoded.
+    """
     base_dir = posixpath.dirname(linking_source)
-    resolved = posixpath.normpath(posixpath.join(base_dir, href_path))
+    resolved = posixpath.normpath(posixpath.join(base_dir, unquote(href_path)))
     return f"path:{resolved[:-3] if resolved.endswith('.md') else resolved}"
 
 
