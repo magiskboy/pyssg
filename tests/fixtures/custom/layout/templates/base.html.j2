@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="{{ lang or 'en' }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ page.title }} | {{ site.title }}</title>
+<link rel="stylesheet" href="/assets/style.css">
+{# Accent is a theme option (layout.toml [options]) overridable via Config.theme. #}
+<style>:root { --accent: {{ theme.accent }}; }</style>
+{% if site.highlight_css %}<style>{{ site.highlight_css }}</style>{% endif %}{% for t in translations %}<link rel="alternate" hreflang="{{ t.lang }}" href="{{ t.url }}">{% endfor %}
+</head>
+<body>
+<header class="site-header">
+<div class="brand">
+<a href="/" class="site-title">{{ site.title }}</a>
+<p class="site-tagline">{{ theme.tagline }}</p>
+</div>
+<nav class="site-nav"><a href="/">{{ t("nav.home") }}</a> <a href="/tags/">{{ t("nav.tags") }}</a>{% for t in translations %} <a class="lang-link" hreflang="{{ t.lang }}" href="{{ t.url }}">{{ t.lang|upper }}</a>{% endfor %}</nav>
+</header>
+<main class="container">
+{% block content %}{% endblock %}
+</main>
+<footer class="site-footer"><p>{{ theme.footer_note }} &middot; {{ site.title }}</p></footer>
+{% if '<pre class="mermaid"' in content_html %}
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+mermaid.initialize({ startOnLoad: true });
+</script>
+{% endif %}
+</body>
+</html>

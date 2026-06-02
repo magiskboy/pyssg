@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>About | Docs Min</title>
+<link rel="canonical" href="https://example.com/about/">
+</head>
+<body>
+<main>
+<p><strong>Off the Shelf</strong> is the pyssg example for <em>theme customization</em>. It runs on the
+<code>blog</code> preset but renders through a local layout under <code>layout/</code> -- an ejected
+copy of the built-in <code>blog</code> theme with edited templates and a rebranded
+stylesheet, plus a few options overridden from <code>pyssg.config.py</code>.</p>
+<p>Look at three files to see how it fits together:</p>
+<ul>
+<li><code>pyssg.config.py</code> -- selects <code>layout="layout"</code> and overrides <code>config.theme</code>.</li>
+<li><code>layout/layout.toml</code> -- declares the theme <code>[options]</code> and their defaults.</li>
+<li><code>layout/templates/base.html.j2</code> -- reads those options as <code>theme.&lt;key&gt;</code>.</li>
+</ul>
+<p>To build it yourself:</p>
+<pre><code class="language-bash">pyssg --site examples/custom build
+pyssg --site examples/custom serve
+</code></pre></main>
+</body>
+</html>

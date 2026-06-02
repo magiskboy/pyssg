@@ -4,15 +4,15 @@
     <loc>https://example.com/about/</loc>
   </url>
   <url>
-    <loc>https://example.com/posts/first-post/</loc>
-    <lastmod>2024-01-10</lastmod>
+    <loc>https://example.com/posts/customizing-the-look/</loc>
+    <lastmod>2024-06-01</lastmod>
   </url>
   <url>
-    <loc>https://example.com/posts/second-post/</loc>
-    <lastmod>2024-02-20</lastmod>
+    <loc>https://example.com/posts/staying-upgrade-friendly/</loc>
+    <lastmod>2024-06-15</lastmod>
   </url>
   <url>
-    <loc>https://example.com/posts/third-post/</loc>
-    <lastmod>2024-03-30</lastmod>
+    <loc>https://example.com/posts/theme-options/</loc>
+    <lastmod>2024-06-08</lastmod>
   </url>
 </urlset>

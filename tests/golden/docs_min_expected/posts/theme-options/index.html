@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Theme options vs. editing templates | Docs Min</title>
+<link rel="canonical" href="https://example.com/posts/theme-options/">
+</head>
+<body>
+<main>
+<p>Not every customization needs a code change. A layout can expose <strong>theme
+options</strong> -- named knobs with defaults -- and a site can flip them from its
+config without touching a single template.</p>
+<h2 id="declaring-options-in-the-layout">Declaring options in the layout</h2>
+<p>The layout declares defaults in <code>layout.toml</code>:</p>
+<pre><code class="language-toml">[options]
+accent = &quot;#0b66c3&quot;
+tagline = &quot;A custom-themed pyssg blog&quot;
+footer_note = &quot;Built with pyssg.&quot;
+show_reading_time = true
+</code></pre>
+<p>Templates read them as <code>theme.&lt;key&gt;</code>:</p>
+<pre><code class="language-jinja">&lt;style&gt;:root { --accent: {{ theme.accent }}; }&lt;/style&gt;
+&lt;p class=&quot;site-tagline&quot;&gt;{{ theme.tagline }}&lt;/p&gt;
+</code></pre>
+<h2 id="overriding-them-from-the-site-config">Overriding them from the site config</h2>
+<p>The site overrides any subset in <code>pyssg.config.py</code>; it is a shallow per-key
+merge over the layout defaults:</p>
+<pre><code class="language-python">config.theme = {
+    &quot;accent&quot;: &quot;#7a3cff&quot;,
+    &quot;tagline&quot;: &quot;Same engine, a theme of my own&quot;,
+}
+</code></pre>
+<p>The accent and tagline you see on this site come from that override; the footer
+note and reading-time flag still come from the layout defaults. Reach for
+template edits (see [[Giving a preset a face of its own]]) only when an option
+cannot express the change.</p></main>
+</body>
+</html>

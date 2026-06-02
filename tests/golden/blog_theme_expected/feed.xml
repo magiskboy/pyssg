@@ -4,19 +4,24 @@
     <title>My Blog</title>
     <link>https://example.com</link>
     <item>
-      <title>Second Post</title>
-      <link>https://example.com/posts/second-post/</link>
-      <description># Second Post</description>
+      <title>Keeping a custom theme upgrade-friendly</title>
+      <link>https://example.com/posts/staying-upgrade-friendly/</link>
+      <description>Once you eject a theme, it is yours -- including the parts you did not mean to own. The copy will not pick up fixes shipped to the built-in theme later. A little discipline keeps that from hurting.</description>
     </item>
     <item>
-      <title>First Post</title>
-      <link>https://example.com/posts/first-post/</link>
-      <description># First Post</description>
+      <title>Theme options vs. editing templates</title>
+      <link>https://example.com/posts/theme-options/</link>
+      <description>Not every customization needs a code change. A layout can expose **theme options** -- named knobs with defaults -- and a site can flip them from its config without touching a single template.</description>
     </item>
     <item>
-      <title>My Blog</title>
-      <link>https://example.com/</link>
-      <description>Welcome to the blog.</description>
+      <title>Giving a preset a face of its own</title>
+      <link>https://example.com/posts/customizing-the-look/</link>
+      <description>Presets get you a working site in one line, but every site eventually wants its own look. This blog is the `blog` preset with a **customized theme** bolted on, and the whole change took two moves.</description>
+    </item>
+    <item>
+      <title>About</title>
+      <link>https://example.com/about/</link>
+      <description>**Off the Shelf** is the pyssg example for *theme customization*. It runs on the `blog` preset but renders through a local layout under `layout/` -- an ejected copy of the built-in `blog` theme with…</description>
     </item>
   </channel>
 </rss>

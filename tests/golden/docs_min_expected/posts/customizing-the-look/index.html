@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Giving a preset a face of its own | Docs Min</title>
+<link rel="canonical" href="https://example.com/posts/customizing-the-look/">
+</head>
+<body>
+<main>
+<p>Presets get you a working site in one line, but every site eventually wants its
+own look. This blog is the <code>blog</code> preset with a <strong>customized theme</strong> bolted on,
+and the whole change took two moves.</p>
+<h2 id="1-eject-the-theme">1. Eject the theme</h2>
+<p>The built-in themes live inside the pyssg package. To edit one, copy it into the
+site first:</p>
+<pre><code class="language-bash">pyssg --site examples/custom eject-layout --theme blog --to layout
+</code></pre>
+<p>That writes an editable copy under <code>layout/</code> -- templates, CSS, and the i18n
+strings. Point the config at it with <code>layout="layout"</code> and you are now serving
+your own copy.</p>
+<h2 id="2-edit-templates-and-css">2. Edit templates and CSS</h2>
+<p>From there it is ordinary front-end work: a coloured header band, a tagline, a
+restyled post list. See [[Theme options vs. editing templates]] for the lighter
+alternative when all you want to change is a colour.</p></main>
+</body>
+</html>

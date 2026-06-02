@@ -1,0 +1,16 @@
+# Blog theme UI strings, Vietnamese. Keys absent here fall back to en.toml.
+
+[nav]
+home = "Trang chủ"
+tags = "Thẻ"
+
+[post]
+reading_time = "{minutes} phút đọc"
+
+[term]
+tagged = "{count} bài viết được gắn thẻ."
+
+[pagination]
+newer = "Mới hơn"
+older = "Cũ hơn"
+page_of = "Trang {current} / {total}"
