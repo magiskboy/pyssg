@@ -177,6 +177,51 @@ class BuildLlmsTest(unittest.TestCase):
         index_pages = [n for n in build.graph.nodes() if n.id == _INDEX_ID]
         self.assertEqual(len(index_pages), 1)
 
+    def test_full_resolves_relative_md_links_to_absolute_urls(self) -> None:
+        build = _build(base_url="https://e.com")
+        # Target page the relative link points at.
+        build.graph.add_node(
+            Document(
+                id="path:blog/other",
+                kind=NodeKind.MARKDOWN,
+                source_path="blog/other.md",
+                meta={"title": "Other"},
+            )
+        )
+        build.graph.add_node(
+            Page(
+                id="page:path:blog/other",
+                kind=NodeKind.PAGE,
+                url="/blog/other/",
+                generated_from=["path:blog/other"],
+            )
+        )
+        # Linking page whose body has a relative .md link, a fragment link, an
+        # external link, and a broken .md link.
+        body = "See [o](other.md), [f](other.md#my-sec), [x](https://x.com), and [b](missing.md)."
+        build.graph.add_node(
+            Document(
+                id="path:blog/post",
+                kind=NodeKind.MARKDOWN,
+                source_path="blog/post.md",
+                meta={"title": "Post", "__body__": body},
+            )
+        )
+        build.graph.add_node(
+            Page(
+                id="page:path:blog/post",
+                kind=NodeKind.PAGE,
+                url="/blog/post/",
+                generated_from=["path:blog/post"],
+            )
+        )
+        build_llms(build)
+        full = _text(build, _FULL_ID)
+        self.assertIn("[o](https://e.com/blog/other/)", full)
+        self.assertIn("[f](https://e.com/blog/other/#my-sec)", full)
+        self.assertIn("[x](https://x.com)", full)  # external untouched
+        self.assertIn("[b](missing.md)", full)  # broken target left as-is
+
     def test_factory_returns_named_plugin(self) -> None:
         plugin = llms()
         self.assertEqual(plugin.name, "llms")

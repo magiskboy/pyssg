@@ -6,9 +6,11 @@ Emits an AI-consumable index of the site following the `llms.txt
 - ``/llms.txt`` -- a Markdown index: an ``# H1`` site title, a ``> blockquote``
   summary, then one ``## Section`` per top-level URL segment listing each page as
   ``- [title](absolute-url): excerpt``.
-- ``/llms-full.txt`` -- the selected pages' raw Markdown bodies concatenated into
-  a single document (separated by ``---``), so an agent can ingest the whole site
-  in one fetch.
+- ``/llms-full.txt`` -- the selected pages' Markdown bodies concatenated into a
+  single document (separated by ``---``), so an agent can ingest the whole site in
+  one fetch. Relative ``.md`` links inside the bodies are resolved to absolute
+  site URLs (the bodies are pre-resolution Markdown, so the raw ``foo.md`` links
+  would otherwise 404 on a site that serves clean URLs).
 
 Honest positioning: the value is for IDE agents (Cursor/Cline/Aider) and MCP doc
 servers that ingest a site as context -- not "SEO for AI". Prior art:
@@ -33,11 +35,15 @@ tests and is not auto re-exported into ``pyssg.plugins``.
 
 from __future__ import annotations
 
+import posixpath
+import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from pyssg.core.node import Document, Page
 from pyssg.core.types import NodeKind
+from pyssg.plugins._context import page_url_of
+from pyssg.plugins.content_meta import slugify
 
 if TYPE_CHECKING:
     from pyssg.core.build import Build
@@ -50,6 +56,12 @@ _FULL_URL = "/llms-full.txt"
 
 # Block separator and per-page header for llms-full.txt.
 _SEPARATOR = "\n\n---\n\n"
+
+# An inline Markdown link ``[text](target)``. Reference-style links and titled
+# targets (``(foo.md "t")``) are intentionally left alone -- only bare relative
+# ``.md`` targets are rewritten.
+_MD_LINK = re.compile(r"\[([^\]]*)\]\(([^)]+)\)")
+_EXTERNAL = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")  # has a URL scheme (http:, mailto:)
 
 
 @dataclass(frozen=True, slots=True)
@@ -77,6 +89,39 @@ def _body(doc: Document) -> str:
         return body
     raw = doc.meta.get("__raw__")
     return raw if isinstance(raw, str) else ""
+
+
+def _resolve_links(build: Build, source_path: str | None, base_url: str, body: str) -> str:
+    """Rewrite relative ``.md`` links in a Markdown body to absolute site URLs.
+
+    The body kept on the node is the *pre-resolution* Markdown, so internal links
+    still point at ``foo.md`` -- which 404s on a site that serves clean URLs. This
+    resolves them the same way the ``link_resolver`` plugin resolves the HTML: a
+    relative ``.md`` href maps to the target document's page URL (made absolute
+    with ``base_url``), with any ``#fragment`` re-slugified. External/absolute/
+    anchor links and links whose target has no page are left untouched.
+    """
+    if source_path is None:
+        return body
+    base_dir = posixpath.dirname(source_path)
+
+    def _replace(match: re.Match[str]) -> str:
+        text, href = match.group(1), match.group(2)
+        if _EXTERNAL.match(href) or href.startswith(("/", "#")):
+            return match.group(0)
+        path, _, fragment = href.partition("#")
+        if not path.endswith(".md"):
+            return match.group(0)
+        resolved = posixpath.normpath(posixpath.join(base_dir, path))
+        target_url = page_url_of(build, f"path:{resolved[:-3]}")
+        if target_url is None:
+            return match.group(0)  # broken/suppressed target: leave it as-is
+        url = f"{base_url}{target_url}"
+        if fragment:
+            url = f"{url}#{slugify(fragment)}"
+        return f"[{text}]({url})"
+
+    return _MD_LINK.sub(_replace, body)
 
 
 def _entries(
@@ -114,7 +159,7 @@ def _entries(
                 link=f"{base_url}{node.url}",
                 title=str(doc.meta.get("title") or node.url),
                 excerpt=str(excerpt) if isinstance(excerpt, str) else "",
-                body=_body(doc),
+                body=_resolve_links(build, doc.source_path, base_url, _body(doc)),
             )
         )
     out.sort(key=lambda e: (e.section, e.url))
