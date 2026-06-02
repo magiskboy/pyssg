@@ -4,6 +4,7 @@ from pygments.formatters import HtmlFormatter
 
 from pyssg.contrib.apidoc import apidoc
 from pyssg.contrib.external_links import external_links
+from pyssg.contrib.graph import graph
 from pyssg.contrib.llms import llms
 from pyssg.plugins import i18n
 from pyssg.presets import docs
@@ -52,5 +53,14 @@ config = docs(
         external_links(),
         i18n(default_locale="en", locales=["en", "vi"]),
         llms(exclude=("vi",), markdown_pages=True),
+        # Interactive document graph: a full-page view at /graph/. Like llms it
+        # mirrors the English docs only (the localized `vi` tree would just
+        # duplicate the structure) and groups nodes by top-level section for
+        # colour. `drop_orphans` hides the many auto-generated API reference pages
+        # that carry no cross-links, keeping the map focused on the hand-written,
+        # interlinked prose docs. `local=True` renders each page's neighbourhood
+        # into the book theme's right sidebar, which provides the
+        # `<!-- pyssg:local-graph -->` placeholder.
+        graph(exclude=("vi/*",), group_by="folder", drop_orphans=True, local=True),
     ],
 )

@@ -89,6 +89,9 @@
       </nav>
       {% endif %}
       {% endblock %}
+      {# The graph plugin (when local=True) replaces this marker with the
+         current page's local graph panel; harmless if the plugin is absent. #}
+      <!-- pyssg:local-graph -->
     </div>
   </aside>
 </main>
