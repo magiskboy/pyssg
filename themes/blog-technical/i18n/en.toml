@@ -1,0 +1,23 @@
+# blog-technical theme UI strings (base language). A site overrides any key by
+# shipping its own i18n/<lang>.toml at the site root.
+
+[nav]
+home = "Home"
+tags = "Tags"
+
+[post]
+reading_time = "{minutes} min read"
+toc = "Table of Contents"
+prev = "Previous"
+next = "Next"
+
+[term]
+tagged = "{count} post(s) tagged."
+
+[pagination]
+newer = "Newer"
+older = "Older"
+
+[code]
+copy = "copy"
+copied = "copied!"

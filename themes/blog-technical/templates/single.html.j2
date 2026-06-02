@@ -1,0 +1,44 @@
+{% extends "base.html.j2" %}
+{% block main %}
+<article class="post-single">
+<header class="post-header">
+{% if theme.show_breadcrumbs and breadcrumbs %}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+{% for crumb in breadcrumbs %}<a href="{{ crumb.url }}">{{ crumb.title }}</a>{% if not loop.last %} <span aria-hidden="true">&rsaquo;</span> {% endif %}{% endfor %}
+</nav>
+{% endif %}
+<h1 class="post-title">{{ page.title }}</h1>
+{% set page_description = page.get('description') %}
+{% if page_description %}<div class="post-description">{{ page_description }}</div>{% endif %}
+<div class="post-meta">
+{% set post_date = page.get('date') %}
+{% if post_date %}<span><time datetime="{{ post_date }}">{{ post_date }}</time></span>{% endif %}
+{% if theme.show_reading_time and reading_time %}<span>&nbsp;&middot;&nbsp;{{ t("post.reading_time", minutes=reading_time) }}</span>{% endif %}
+</div>
+</header>
+{% if theme.show_toc and toc %}
+<details class="toc"{% if theme.toc_open %} open{% endif %}>
+<summary accesskey="c" title="(Alt + C)"><span class="title">{{ t("post.toc") }}</span></summary>
+<div class="inner">
+<ul>{% for h in toc %}<li class="toc-level-{{ h.level }}"><a href="#{{ h.slug }}" aria-label="{{ h.text }}">{{ h.text }}</a></li>{% endfor %}</ul>
+</div>
+</details>
+{% endif %}
+<div class="post-content md-content">
+{{ content_html }}
+</div>
+<footer class="post-footer">
+{% if theme.show_tags and tags %}
+<ul class="post-tags">
+{% for tag in tags %}<li><a href="/tags/{{ tag }}/">{{ tag }}</a></li>{% endfor %}
+</ul>
+{% endif %}
+{% if theme.show_post_nav and (prev or next) %}
+<nav class="paginav">
+{% if prev %}<a class="prev" href="{{ prev.url }}"><span class="title">&laquo; {{ t("post.prev") }}</span><span>{{ prev.title }}</span></a>{% endif %}
+{% if next %}<a class="next" href="{{ next.url }}"><span class="title">{{ t("post.next") }} &raquo;</span><span>{{ next.title }}</span></a>{% endif %}
+</nav>
+{% endif %}
+</footer>
+</article>
+{% endblock %}

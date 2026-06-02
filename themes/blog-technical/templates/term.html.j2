@@ -1,0 +1,14 @@
+{% extends "base.html.j2" %}
+{% block body_class %}list{% endblock %}
+{% block main %}
+<header class="page-header">
+<h1>{{ page.title }}</h1>
+<div class="post-description">{{ t("term.tagged", count=page.count) }}</div>
+</header>
+{% for m in page.members %}
+<article class="post-entry">
+<header class="entry-header"><h2>{{ m.title }}</h2></header>
+<a class="entry-link" aria-label="post link to {{ m.title }}" href="{{ m.url }}"></a>
+</article>
+{% endfor %}
+{% endblock %}

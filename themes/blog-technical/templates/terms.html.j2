@@ -1,0 +1,10 @@
+{% extends "base.html.j2" %}
+{% block body_class %}list{% endblock %}
+{% block main %}
+<header class="page-header">
+<h1>{{ page.title }}</h1>
+</header>
+<ul class="terms-tags">
+{% for tg in page.terms %}<li><a href="{{ tg.url }}">{{ tg.term }} <sup>{{ tg.count }}</sup></a></li>{% endfor %}
+</ul>
+{% endblock %}

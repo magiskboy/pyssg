@@ -1,0 +1,79 @@
+{#
+  Base layout for the blog-technical theme (ported from hugo-PaperMod).
+
+  Class names mirror PaperMod so its stylesheet applies unchanged. Pages set
+  their body class via the ``body_class`` block: list/term pages use ``list``
+  (tinted background from theme-vars), single posts leave it empty.
+#}<!doctype html>
+<html lang="{{ lang or 'en' }}" dir="auto"{% if theme.default_theme in ('light', 'dark') %} data-theme="{{ theme.default_theme }}"{% endif %}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+{% set page_description = page.get('description') %}
+{% if page_description %}<meta name="description" content="{{ page_description }}">{% endif %}
+<link rel="stylesheet" href="/assets/style.css">
+{% if site.highlight_css %}<style>{{ site.highlight_css }}</style>{% endif %}
+{% for tr in translations %}<link rel="alternate" hreflang="{{ tr.lang }}" href="{{ tr.url }}">{% endfor %}
+<noscript><style>#theme-toggle,.top-link{display:none}</style></noscript>
+{% if theme.show_theme_toggle %}
+<script>
+// Resolve the color scheme before first paint to avoid a flash. A user choice in
+// localStorage wins; otherwise fall back to the theme's default_theme, and
+// "auto" follows the OS preference.
+(function () {
+  var pref = localStorage.getItem("pref-theme");
+  var dflt = {{ theme.default_theme | tojson }};
+  var el = document.documentElement;
+  if (pref === "dark" || pref === "light") { el.dataset.theme = pref; }
+  else if (dflt === "dark" || dflt === "light") { el.dataset.theme = dflt; }
+  else { el.dataset.theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; }
+})();
+</script>
+{% endif %}
+</head>
+<body class="{% block body_class %}{% endblock %}" id="top">
+<header class="header">
+<nav class="nav">
+<div class="logo">
+<a href="/" accesskey="h" title="{{ site.title }}">{{ site.title }}</a>
+{% if theme.show_theme_toggle %}
+<button id="theme-toggle" accesskey="t" title="Toggle theme" aria-label="Toggle theme">
+<svg id="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+<svg id="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+</button>
+{% endif %}
+</div>
+<ul id="menu">
+<li><a href="/"><span>{{ t("nav.home") }}</span></a></li>
+<li><a href="/tags/"><span>{{ t("nav.tags") }}</span></a></li>
+{% for tr in translations %}<li><a class="lang-link" hreflang="{{ tr.lang }}" href="{{ tr.url }}"><span>{{ tr.lang|upper }}</span></a></li>{% endfor %}
+</ul>
+</nav>
+</header>
+<main class="main">
+{% block main %}{% endblock %}
+</main>
+<footer class="footer">
+<span>&copy; {{ site.title }}</span>
+<span>Powered by <a href="https://github.com/magiskboy/pyssg" rel="noopener" target="_blank">pyssg</a>, theme adapted from <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a></span>
+</footer>
+{% if theme.show_scroll_to_top %}
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"></polyline><polyline points="17 18 12 13 7 18"></polyline></svg>
+</a>
+{% endif %}
+{% if '<pre class="mermaid"' in content_html %}
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+mermaid.initialize({ startOnLoad: true });
+</script>
+{% endif %}
+<script src="/assets/js/theme.js"
+  data-theme-toggle="{{ 'true' if theme.show_theme_toggle else 'false' }}"
+  data-scroll-top="{{ 'true' if theme.show_scroll_to_top else 'false' }}"
+  data-code-copy="{{ 'true' if theme.show_code_copy else 'false' }}"
+  data-copy-label="{{ t('code.copy') }}"
+  data-copied-label="{{ t('code.copied') }}"></script>
+</body>
+</html>

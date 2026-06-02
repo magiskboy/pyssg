@@ -1,0 +1,24 @@
+name = "blog-technical"
+version = "0.1.0"
+default_template = "single.html.j2"
+
+# Configurable theme options (the theme configuration API, issue #53). These are
+# the defaults; a site overrides any key via ``Config.theme`` and reads them in
+# templates as ``theme.<key>``. Keep this table flat and documented -- it is the
+# theme's public knob list.
+[options]
+# Color-scheme handling. "auto" follows the OS preference; "light"/"dark" pin it.
+default_theme = "auto"
+# Show the light/dark toggle button in the header.
+show_theme_toggle = true
+# Per-post chrome.
+show_reading_time = true
+show_breadcrumbs = true
+show_post_nav = true
+show_tags = true
+# Table of contents on post pages; ``toc_open`` expands it by default.
+show_toc = true
+toc_open = false
+# Floating "back to top" control and per-code-block copy buttons.
+show_scroll_to_top = true
+show_code_copy = true

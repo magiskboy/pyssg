@@ -1,0 +1,39 @@
+{% extends "base.html.j2" %}
+{% block body_class %}list{% endblock %}
+{% block main %}
+{% if page.title %}
+<header class="page-header">
+<h1>{{ page.title }}</h1>
+</header>
+{% endif %}
+{% if content_html %}<div class="post-content md-content">{{ content_html }}</div>{% endif %}
+{% set items = page.get('items') %}
+{% if items is not none %}
+{# Collection index (blog preset): a paginated slice of posts. #}
+{% for post in items %}
+<article class="post-entry">
+<header class="entry-header"><h2 class="entry-hint-parent">{{ post.title }}</h2></header>
+{% if post.excerpt %}<div class="entry-content"><p>{{ post.excerpt }}</p></div>{% endif %}
+{% if post.date %}<footer class="entry-footer"><span><time datetime="{{ post.date }}">{{ post.date }}</time></span></footer>{% endif %}
+<a class="entry-link" aria-label="post link to {{ post.title }}" href="{{ post.url }}"></a>
+</article>
+{% endfor %}
+{% set pg = page.get('pagination') %}
+{% if pg and pg.total > 1 %}
+<footer class="page-footer">
+<nav class="pagination">
+{% if pg.prev %}<a class="prev" href="{{ pg.prev }}">&laquo;&nbsp;{{ t("pagination.newer") }}</a>{% endif %}
+{% if pg.next %}<a class="next" href="{{ pg.next }}">{{ t("pagination.older") }}&nbsp;&raquo;</a>{% endif %}
+</nav>
+</footer>
+{% endif %}
+{% else %}
+{# Standalone use (no collection): list pages grouped by section from the nav menu. #}
+{% for sec in menu %}{% if sec.section %}{% for item in sec['items'] %}
+<article class="post-entry">
+<header class="entry-header"><h2>{{ item.title }}</h2></header>
+<a class="entry-link" aria-label="post link to {{ item.title }}" href="{{ item.url }}"></a>
+</article>
+{% endfor %}{% endif %}{% endfor %}
+{% endif %}
+{% endblock %}
