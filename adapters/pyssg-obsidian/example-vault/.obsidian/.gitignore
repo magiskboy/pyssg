@@ -1,0 +1,6 @@
+# Keep the example vault minimal: only the files that define it, not the
+# per-user state Obsidian writes (workspace layout, enabled plugins, appearance).
+*
+!.gitignore
+!app.json
+!templates.json

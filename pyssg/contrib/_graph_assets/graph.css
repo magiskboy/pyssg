@@ -1,0 +1,94 @@
+/*
+ * Styles for the pyssg document-graph views.
+ *
+ * Two consumers: the standalone global page (`body.graph-page`) and the local
+ * sidebar panel (`#kb-local-graph`) injected into document pages. Kept minimal
+ * and theme-neutral so it composes with any host theme.
+ */
+
+/* Global full-page graph. */
+.graph-page {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.graph-page .graph-stage {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.graph-controls {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.graph-controls input,
+.graph-controls button {
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  background: #fff;
+  color: #222;
+  cursor: pointer;
+}
+
+.graph-controls input {
+  cursor: text;
+  min-width: 12rem;
+}
+
+.graph-controls button[aria-pressed="true"] {
+  background: #333;
+  color: #fff;
+  border-color: #333;
+}
+
+#graph-panel {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 10;
+  max-width: 18rem;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+/*
+ * Per-page local graph panel. Inherits the host theme via CSS variables (with
+ * fallbacks) so it blends into the page in both light and dark mode instead of
+ * reading as a heavy dark box. A theme can override these on `#kb-local-graph`.
+ */
+#kb-local-graph {
+  display: block;
+  width: 100%;
+  height: 220px;
+  margin: 1rem 0;
+  border: 1px solid var(--muted-font-color, #d8dde3);
+  border-radius: var(--border-radius, 8px);
+  /* Subtle elevated surface; slightly transparent so it never clashes hard. */
+  background: var(--code-bg, #f6f8fa);
+  opacity: 0.96;
+}
+
+/* Standalone global page controls keep an explicit dark-mode fallback (it does
+   not load the host theme's variables). */
+@media (prefers-color-scheme: dark) {
+  .graph-controls input,
+  .graph-controls button,
+  #graph-panel {
+    background: #1e1e1e;
+    color: #e6e6e6;
+    border-color: #3a3a3a;
+  }
+}

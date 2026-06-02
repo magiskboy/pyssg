@@ -31,6 +31,8 @@ bốn loại, mỗi loại phục vụ một nhu cầu khác nhau:
 - **[Hướng dẫn theo việc (How-to)](how-to/index.md)** - các công thức theo từng
   bài toán cụ thể (thêm i18n, tùy biến theme, viết plugin, sinh API reference,
   triển khai).
+- **[Tích hợp (Integrations)](integrations/index.md)** - publish từ chính công cụ
+  bạn đang viết (ví dụ một vault [Obsidian](integrations/obsidian.md)).
 - **[Tham chiếu (Reference)](reference/index.md)** - định hướng thông tin, mô tả
   chính xác về CLI, cấu hình, frontmatter và các plugin tích hợp sẵn.
 - **[Diễn giải (Explanation)](explanation/index.md)** - định hướng hiểu sâu, bàn

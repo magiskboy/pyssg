@@ -1,0 +1,11 @@
+# npm
+node_modules
+
+# Built bundle (uploaded to releases, not committed)
+main.js
+*.map
+
+# Obsidian local plugin data
+data.json
+
+.DS_Store

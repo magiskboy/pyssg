@@ -1,6 +1,6 @@
 """Command-line interface.
 
-- ``pyssg init`` scaffolds a new site for a preset (``--preset docs|blog``).
+- ``pyssg init`` scaffolds a new site for a preset (``--preset docs|blog|obsidian``).
 - ``pyssg build`` runs a full build (``--no-cache``, ``--profile``).
 - ``pyssg serve`` watches + incrementally rebuilds + serves with live reload.
 - ``pyssg clean`` removes the output dir and cache (with confirmation).
@@ -12,11 +12,18 @@
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 from pathlib import Path
 
 from pyssg.cli import deploy as deploy_cli
-from pyssg.cli.common import CACHE_DIRNAME, build_site, make_builder, open_cache
+from pyssg.cli.common import (
+    CACHE_DIRNAME,
+    build_site,
+    build_stats_payload,
+    make_builder,
+    open_cache,
+)
 from pyssg.cli.scaffold import PRESETS, eject_layout, init_site, list_themes
 from pyssg.cli.serve import serve
 from pyssg.config import load_config
@@ -46,6 +53,15 @@ def _cmd_eject(args: argparse.Namespace) -> int:
 
 def _cmd_build(args: argparse.Namespace) -> int:
     site = Path(args.site)
+    if args.json:
+        try:
+            stats = build_site(site, open_cache(site.resolve(), args.no_cache))
+        except Exception as exc:
+            print(json.dumps({"command": "build", "ok": False, "error": str(exc)}), flush=True)
+            return 1
+        payload = {"command": "build", "ok": True, **build_stats_payload(stats)}
+        print(json.dumps(payload), flush=True)
+        return 0
     stats = build_site(site, open_cache(site.resolve(), args.no_cache))
     print(f"build: {len(stats.changed_outputs)} pages written")
     if args.profile:
@@ -58,7 +74,13 @@ def _cmd_build(args: argparse.Namespace) -> int:
 
 
 def _cmd_serve(args: argparse.Namespace) -> int:
-    serve(Path(args.site), host=args.host, port=args.port, no_cache=args.no_cache)
+    serve(
+        Path(args.site),
+        host=args.host,
+        port=args.port,
+        no_cache=args.no_cache,
+        json_output=args.json,
+    )
     return 0
 
 
@@ -96,11 +118,13 @@ def main(argv: list[str] | None = None) -> int:
     build = sub.add_parser("build", help="full build to output_dir")
     build.add_argument("--no-cache", action="store_true", help="ignore the persistent cache")
     build.add_argument("--profile", action="store_true", help="print per-phase counts")
+    build.add_argument("--json", action="store_true", help="emit a machine-readable summary")
 
     srv = sub.add_parser("serve", help="watch + incremental + dev server")
     srv.add_argument("--no-cache", action="store_true")
     srv.add_argument("--host", default="127.0.0.1")
     srv.add_argument("--port", type=int, default=8000)
+    srv.add_argument("--json", action="store_true", help="emit machine-readable NDJSON events")
 
     clean = sub.add_parser("clean", help="remove output_dir + cache")
     clean.add_argument("--yes", action="store_true", help="skip confirmation")

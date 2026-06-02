@@ -8,17 +8,23 @@ to refresh.
 
 Threading: the watchdog observer and the HTTP server each run on their own
 thread; the main thread blocks until interrupted.
+
+With ``json_output`` the human-readable lines are replaced by newline-delimited
+JSON events on stdout (a ``ready`` event carrying the served URL, then a
+``rebuild`` event per filesystem burst), so an integration such as the Obsidian
+adapter can track the server without scraping log text.
 """
 
 from __future__ import annotations
 
 import asyncio
+import json
 import threading
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from time import perf_counter
 
-from pyssg.cli.common import make_builder, open_cache
+from pyssg.cli.common import build_stats_payload, make_builder, open_cache
 from pyssg.core.build import BuildStats
 from pyssg.core.phases import IncrementalSession
 from pyssg.core.types import Phase
@@ -81,21 +87,36 @@ def _reparsed(stats: BuildStats) -> int:
     return stats.touched_per_phase.get(Phase.PARSE, 0)
 
 
+def _emit_event(event: dict[str, object]) -> None:
+    """Write one NDJSON event to stdout (one compact JSON object per line)."""
+    print(json.dumps(event), flush=True)
+
+
 def serve(
-    site_dir: Path, host: str = "127.0.0.1", port: int = 8000, *, no_cache: bool = False
+    site_dir: Path,
+    host: str = "127.0.0.1",
+    port: int = 8000,
+    *,
+    no_cache: bool = False,
+    json_output: bool = False,
 ) -> None:
-    """Build, serve and live-rebuild a site until interrupted."""
+    """Build, serve and live-rebuild a site until interrupted.
+
+    With ``json_output`` the progress lines become NDJSON events on stdout (see
+    the module docstring); otherwise they are human-readable text.
+    """
     site_dir = site_dir.resolve()
     builder = make_builder(site_dir, open_cache(site_dir, no_cache))
     session = IncrementalSession(builder)
 
     started = perf_counter()
     stats = asyncio.run(session.initial_build())
-    print(
-        f"initial build: {len(stats.changed_outputs)} pages "
-        f"in {(perf_counter() - started) * 1000:.0f} ms",
-        flush=True,
-    )
+    initial_ms = (perf_counter() - started) * 1000
+    if not json_output:
+        print(
+            f"initial build: {len(stats.changed_outputs)} pages in {initial_ms:.0f} ms",
+            flush=True,
+        )
 
     out_root = session.out_root
     out_root.mkdir(parents=True, exist_ok=True)
@@ -118,12 +139,15 @@ def serve(
             kind = "full"
         if stats.changed_outputs:
             token[0] += 1
-        print(
-            f"{kind} rebuild: {len(stats.changed_outputs)} output(s), "
-            f"{_reparsed(stats)} doc(s) reparsed, {stats.cache_hits} cache hit(s) "
-            f"in {(perf_counter() - started) * 1000:.0f} ms",
-            flush=True,
-        )
+        if json_output:
+            _emit_event({"event": "rebuild", "kind": kind, **build_stats_payload(stats)})
+        else:
+            print(
+                f"{kind} rebuild: {len(stats.changed_outputs)} output(s), "
+                f"{_reparsed(stats)} doc(s) reparsed, {stats.cache_hits} cache hit(s) "
+                f"in {(perf_counter() - started) * 1000:.0f} ms",
+                flush=True,
+            )
 
     roots = [str(content_root)]
     if builder.layout is not None:
@@ -131,11 +155,16 @@ def serve(
     watcher = FsWatcher(roots, ignore=[str(out_root), "*.tmp"])
     watcher.run(on_batch)
 
-    print(f"serving http://{host}:{port}/  (Ctrl-C to stop)", flush=True)
+    url = f"http://{host}:{port}/"
+    if json_output:
+        _emit_event({"event": "ready", "url": url, **build_stats_payload(stats)})
+    else:
+        print(f"serving {url}  (Ctrl-C to stop)", flush=True)
     try:
         threading.Event().wait()
     except KeyboardInterrupt:
-        print("\nstopping")
+        if not json_output:
+            print("\nstopping")
     finally:
         watcher.stop()
         httpd.shutdown()

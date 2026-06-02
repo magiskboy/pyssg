@@ -15,5 +15,6 @@ from __future__ import annotations
 
 from pyssg.presets.blog import blog
 from pyssg.presets.docs import docs
+from pyssg.presets.obsidian import obsidian
 
-__all__ = ["blog", "docs"]
+__all__ = ["blog", "docs", "obsidian"]

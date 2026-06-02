@@ -7,7 +7,7 @@ from pathlib import Path
 
 from pyssg.config import Config
 from pyssg.core.errors import LayoutError
-from pyssg.presets import blog, docs
+from pyssg.presets import blog, docs, obsidian
 from pyssg.themes import available_themes, theme_path
 
 
@@ -31,6 +31,29 @@ class ThemePathTest(unittest.TestCase):
         listed = available_themes()
         self.assertIn("docs", listed)
         self.assertIn("blog", listed)
+
+
+class ObsidianPresetTest(unittest.TestCase):
+    def test_returns_config_with_docs_theme_by_default(self) -> None:
+        config = obsidian(site={"title": "Vault"})
+        self.assertIsInstance(config, Config)
+        self.assertEqual(config.layout, theme_path("docs"))
+
+    def test_pipeline_includes_obsidian_specific_plugins(self) -> None:
+        names = [p.name for p in obsidian().plugins]
+        self.assertIn("obsidian_attachments", names)
+        self.assertIn("publish_gate", names)
+        self.assertIn("directory_loader", names)
+
+    def test_extra_plugins_are_appended_after_defaults(self) -> None:
+        from pyssg.contrib.external_links import external_links
+
+        config = obsidian(extra_plugins=[external_links()])
+        self.assertEqual(config.plugins[-1].name, "external_links")
+
+    def test_layout_override_is_used_verbatim(self) -> None:
+        config = obsidian(layout="layouts/custom")
+        self.assertEqual(config.layout, "layouts/custom")
 
 
 class DocsPresetTest(unittest.TestCase):

@@ -34,6 +34,18 @@ class InitSiteTest(unittest.TestCase):
         self.assertTrue((site / "dist" / "index.html").is_file())
         self.assertTrue((site / "dist" / "posts" / "hello-world" / "index.html").is_file())
 
+    def test_init_obsidian_then_build(self) -> None:
+        site = self.tmp / "vault_site"
+        init_site(site, preset="obsidian")
+        load_config(site)
+        build_site(site)
+        # Both scaffold notes are marked publish: true, so both render; the
+        # wikilink from the home page resolves to the getting-started note.
+        self.assertTrue((site / "dist" / "index.html").is_file())
+        self.assertTrue((site / "dist" / "Getting Started" / "index.html").is_file())
+        home = (site / "dist" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="/Getting Started/"', home)
+
     def test_init_is_deterministic(self) -> None:
         a = self.tmp / "a"
         b = self.tmp / "b"

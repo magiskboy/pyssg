@@ -29,6 +29,8 @@ splits docs into four kinds, each serving a different need:
 - **[How-to guides](how-to/index.md)** - task-oriented recipes for specific
   problems (add i18n, customize a theme, write a plugin, generate an API
   reference, deploy).
+- **[Integrations](integrations/index.md)** - publish from the tools you already
+  write in (e.g. an [Obsidian](integrations/obsidian.md) vault).
 - **[Reference](reference/index.md)** - information-oriented, precise
   descriptions of the CLI, configuration, frontmatter, and the built-in plugins.
 - **[Explanation](explanation/index.md)** - understanding-oriented discussion of

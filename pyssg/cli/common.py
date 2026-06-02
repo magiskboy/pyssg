@@ -11,9 +11,30 @@ from pyssg.core.build import BuildStats
 from pyssg.core.builder import Builder
 from pyssg.core.incremental.cache import Cache, FsCache, MemoryCache
 from pyssg.core.phases import full_build
+from pyssg.core.types import Phase
 from pyssg.layout import Layout, load_layout
 
 CACHE_DIRNAME = ".pyssg-cache"
+
+
+def build_stats_payload(stats: BuildStats) -> dict[str, object]:
+    """Machine-readable summary of a build, for ``--json`` consumers.
+
+    A pure function of ``stats``: it derives the page count, cache-hit count and
+    per-phase touch counts, so the same build always yields the same payload.
+    The shape is the stable contract integrations (e.g. the Obsidian adapter)
+    parse instead of scraping human-readable log lines.
+    """
+    phases = {
+        phase.name.lower(): count
+        for phase in Phase
+        if (count := stats.touched_per_phase.get(phase))
+    }
+    return {
+        "pages": len(stats.changed_outputs),
+        "cache_hits": stats.cache_hits,
+        "phases": phases,
+    }
 
 
 def _warn_unknown_theme_options(config: Config, layout: Layout | None) -> None:

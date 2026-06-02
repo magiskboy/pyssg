@@ -29,11 +29,21 @@ _PARSE_STAGE = 100  # before markdown (200)
 
 
 def split_frontmatter(raw: str) -> tuple[dict[str, object], str]:
-    """Return ``(metadata, body)``; metadata is empty if there is no frontmatter."""
+    """Return ``(metadata, body)``; metadata is empty if there is no frontmatter.
+
+    Malformed YAML in the block is tolerated rather than fatal: a document whose
+    frontmatter cannot be parsed (e.g. an Obsidian template note containing
+    ``date: {{date}}``) is treated as having no frontmatter, keeping its body, so
+    one stray file never aborts the whole build. The outcome is a deterministic
+    function of the input, so the build-twice invariant still holds.
+    """
     match = _FRONTMATTER.match(raw)
     if match is None:
         return {}, raw
-    parsed: object = yaml.safe_load(match.group("meta"))
+    try:
+        parsed: object = yaml.safe_load(match.group("meta"))
+    except yaml.YAMLError:
+        return {}, match.group("body")
     if not isinstance(parsed, dict):
         return {}, match.group("body")
     meta = {str(key): value for key, value in parsed.items()}
