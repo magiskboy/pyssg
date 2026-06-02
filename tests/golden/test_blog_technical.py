@@ -1,60 +1,57 @@
-"""Build test for the built-in ``blog-technical`` theme (ported from PaperMod).
+"""Build test for the gallery ``blog-technical`` theme (ported from PaperMod).
 
-The fixture drives the theme through the ``blog`` preset (paginated post
-collection) and overrides two theme options, so the test covers three things at
-once: the theme renders PaperMod's page structure, the theme configuration API
-(#53) layers ``Config.theme`` over the ``layout.toml`` defaults, and two
-independent builds are byte-identical (determinism).
+Drives the gallery theme through the ``blog`` preset over the shared content
+fixture and overrides two theme options, covering three things at once: the theme
+renders PaperMod's page structure, the theme configuration API (#53) layers
+``config.theme`` over the ``layout.toml`` defaults, and two independent builds are
+byte-identical (determinism).
 
-This is assertion-based rather than a byte snapshot: the theme bundles a large
-stylesheet whose bytes are already version-controlled in the theme directory, so
-re-committing them as a golden tree would only add brittle duplication. The
-determinism check still guards reproducibility end to end.
+Assertion-based rather than a byte snapshot: the theme bundles a large stylesheet
+whose bytes are already version-controlled in the theme directory, so
+re-committing them as a golden tree would only add brittle duplication. The theme
+lives in the repo-root ``themes/`` gallery (source-only), so the helper vendors it
+into the site under ``theme/`` to match the config's ``layout="theme"``.
 """
 
 from __future__ import annotations
 
-import shutil
 import tempfile
 import unittest
 from pathlib import Path
 
-FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "blog_technical"
-# The theme lives in the repo-root `themes/` gallery (source-only, not shipped in
-# the pyssg wheel), so it is referenced by path rather than via `theme_path`.
-THEME = Path(__file__).resolve().parents[2] / "themes" / "blog-technical"
+from tests._support import build_site_from_fixture, files_under
 
+CONFIG = """\
+from __future__ import annotations
 
-def _files_under(root: Path) -> dict[str, str]:
-    return {
-        p.relative_to(root).as_posix(): p.read_text(encoding="utf-8")
-        for p in sorted(root.rglob("*"))
-        if p.is_file()
-    }
+from pyssg.presets import blog
 
+config = blog(
+    site={"title": "My Blog"},
+    base_url="https://example.com",
+    posts_per_page=2,
+    layout="theme",
+)
+config.theme = {"default_theme": "dark", "toc_open": True}
+"""
 
-def _build_into(tmp_path: Path) -> Path:
-    from pyssg.cli import build_site
-
-    site = tmp_path / "site"
-    shutil.copytree(FIXTURE, site)
-    # Vendor the gallery theme into the site under `theme/`, matching the
-    # relative `layout="theme"` the fixture config points at.
-    shutil.copytree(THEME, site / "theme")
-    build_site(site)
-    return site / "dist"
+# A nested post that exists in the shared content fixture, used to assert the
+# theme's single-post structure.
+POST = "posts/customizing-the-look/index.html"
 
 
 class BlogTechnicalThemeTest(unittest.TestCase):
     def setUp(self) -> None:
         self.tmp_path = Path(self.enterContext(tempfile.TemporaryDirectory()))
-        self.dist = _build_into(self.tmp_path)
+        self.dist = build_site_from_fixture(
+            self.tmp_path, config=CONFIG, vendor_theme="blog-technical"
+        )
 
     def _read(self, rel: str) -> str:
         return (self.dist / rel).read_text(encoding="utf-8")
 
     def test_post_page_has_papermod_structure(self) -> None:
-        post = self._read("posts/first-post/index.html")
+        post = self._read(POST)
         # Core PaperMod building blocks, keyed by the class names its CSS targets.
         for marker in (
             'class="post-single"',
@@ -80,25 +77,29 @@ class BlogTechnicalThemeTest(unittest.TestCase):
         self.assertIn('class="terms-tags"', tags)
 
     def test_theme_option_overrides_propagate(self) -> None:
-        # Fixture sets Config.theme = {default_theme: dark, toc_open: True}.
-        post = self._read("posts/first-post/index.html")
+        # Config sets theme = {default_theme: dark, toc_open: True}.
+        post = self._read(POST)
         self.assertIn('data-theme="dark"', post)
         self.assertIn('<details class="toc" open', post)
 
     def test_theme_option_defaults_apply(self) -> None:
         # show_reading_time defaults to true in layout.toml and is not overridden.
-        post = self._read("posts/first-post/index.html")
-        self.assertIn("min read", post)
+        self.assertIn("min read", self._read(POST))
 
     def test_assets_are_copied(self) -> None:
         self.assertTrue((self.dist / "assets" / "style.css").is_file())
         self.assertTrue((self.dist / "assets" / "js" / "theme.js").is_file())
 
     def test_build_is_deterministic(self) -> None:
-        first = _files_under(_build_into(self.tmp_path / "a"))
-        second = _files_under(_build_into(self.tmp_path / "b"))
+        """Two independent builds of the same site produce identical bytes."""
+        first = files_under(
+            build_site_from_fixture(
+                self.tmp_path, config=CONFIG, vendor_theme="blog-technical", name="a"
+            )
+        )
+        second = files_under(
+            build_site_from_fixture(
+                self.tmp_path, config=CONFIG, vendor_theme="blog-technical", name="b"
+            )
+        )
         self.assertEqual(first, second)
-
-
-if __name__ == "__main__":
-    unittest.main()

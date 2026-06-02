@@ -1,55 +1,55 @@
 """Build test for the gallery ``docs-technical`` theme (docsy-style).
 
-Mirrors the other gallery-theme tests: the fixture drives the theme through the
-``docs`` preset with two ``Config.theme`` overrides, so this covers the docsy-like
-three-column structure, the theme configuration API (#53) layering -- including
-the runtime ``accent`` color fed into a CSS custom property -- and byte-for-byte
-determinism across two builds.
+Drives the gallery theme through the ``docs`` preset over the shared content
+fixture with two ``config.theme`` overrides, covering the docsy-like three-column
+structure, the theme configuration API (#53) layering -- including the runtime
+``accent`` color fed into a CSS custom property -- and byte-for-byte determinism
+across two builds.
+
+Assertions target a nested post in the shared fixture (``posts/customizing-the-
+look/``) so the breadcrumb, active sidebar link, and on-this-page TOC all have
+something to render. The theme lives in the repo-root ``themes/`` gallery
+(source-only), so the helper vendors it into the site under ``theme/`` to match
+the config's ``layout="theme"``.
 """
 
 from __future__ import annotations
 
-import shutil
 import tempfile
 import unittest
 from pathlib import Path
 
-FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "docs_technical"
-# The theme lives in the repo-root `themes/` gallery (source-only, not shipped in
-# the pyssg wheel), so it is referenced by path rather than via `theme_path`.
-THEME = Path(__file__).resolve().parents[2] / "themes" / "docs-technical"
+from tests._support import build_site_from_fixture, files_under
 
+CONFIG = """\
+from __future__ import annotations
 
-def _files_under(root: Path) -> dict[str, str]:
-    return {
-        p.relative_to(root).as_posix(): p.read_text(encoding="utf-8")
-        for p in sorted(root.rglob("*"))
-        if p.is_file()
-    }
+from pyssg.presets import docs
 
+config = docs(
+    site={"title": "My Docs"},
+    base_url="https://example.com",
+    layout="theme",
+)
+config.theme = {"default_theme": "dark", "accent": "#b5179e"}
+"""
 
-def _build_into(tmp_path: Path) -> Path:
-    from pyssg.cli import build_site
-
-    site = tmp_path / "site"
-    shutil.copytree(FIXTURE, site)
-    # Vendor the gallery theme into the site under `theme/`, matching the
-    # relative `layout="theme"` the fixture config points at.
-    shutil.copytree(THEME, site / "theme")
-    build_site(site)
-    return site / "dist"
+# A nested post that exists in the shared content fixture.
+PAGE = "posts/customizing-the-look/index.html"
 
 
 class DocsTechnicalThemeTest(unittest.TestCase):
     def setUp(self) -> None:
         self.tmp_path = Path(self.enterContext(tempfile.TemporaryDirectory()))
-        self.dist = _build_into(self.tmp_path)
+        self.dist = build_site_from_fixture(
+            self.tmp_path, config=CONFIG, vendor_theme="docs-technical"
+        )
 
     def _read(self, rel: str) -> str:
         return (self.dist / rel).read_text(encoding="utf-8")
 
     def test_page_has_docsy_three_column_structure(self) -> None:
-        page = self._read("guide/getting-started/index.html")
+        page = self._read(PAGE)
         for marker in (
             'class="td-navbar"',
             'class="td-main"',
@@ -61,38 +61,41 @@ class DocsTechnicalThemeTest(unittest.TestCase):
             self.assertIn(marker, page)
 
     def test_sidebar_marks_current_page_active(self) -> None:
-        page = self._read("guide/getting-started/index.html")
-        self.assertIn('href="/guide/getting-started/" class="active"', page)
+        page = self._read(PAGE)
+        self.assertIn('href="/posts/customizing-the-look/" class="active"', page)
 
     def test_on_this_page_toc_renders(self) -> None:
-        page = self._read("guide/getting-started/index.html")
-        self.assertIn('class="td-toc"', page)
+        self.assertIn('class="td-toc"', self._read(PAGE))
 
     def test_tags_index_uses_tag_cloud(self) -> None:
         tags = self._read("tags/index.html")
         self.assertIn('class="td-tag-cloud"', tags)
 
     def test_theme_option_overrides_propagate(self) -> None:
-        # Fixture sets Config.theme = {default_theme: dark, accent: #b5179e}.
-        page = self._read("guide/getting-started/index.html")
+        # Config sets theme = {default_theme: dark, accent: #b5179e}.
+        page = self._read(PAGE)
         self.assertIn('data-theme="dark"', page)
         # The accent option is a real runtime value, fed into --td-accent.
         self.assertIn("--td-accent: #b5179e", page)
 
     def test_theme_option_defaults_apply(self) -> None:
         # sidebar_title defaults to "Documentation" in layout.toml (not overridden).
-        page = self._read("index.html")
-        self.assertIn("Documentation", page)
+        self.assertIn("Documentation", self._read(PAGE))
 
     def test_assets_are_copied(self) -> None:
         self.assertTrue((self.dist / "assets" / "style.css").is_file())
         self.assertTrue((self.dist / "assets" / "js" / "theme.js").is_file())
 
     def test_build_is_deterministic(self) -> None:
-        first = _files_under(_build_into(self.tmp_path / "a"))
-        second = _files_under(_build_into(self.tmp_path / "b"))
+        """Two independent builds of the same site produce identical bytes."""
+        first = files_under(
+            build_site_from_fixture(
+                self.tmp_path, config=CONFIG, vendor_theme="docs-technical", name="a"
+            )
+        )
+        second = files_under(
+            build_site_from_fixture(
+                self.tmp_path, config=CONFIG, vendor_theme="docs-technical", name="b"
+            )
+        )
         self.assertEqual(first, second)
-
-
-if __name__ == "__main__":
-    unittest.main()

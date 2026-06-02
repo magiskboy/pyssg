@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Keeping a custom theme upgrade-friendly | Docs Min</title>
+<link rel="canonical" href="https://example.com/posts/staying-upgrade-friendly/">
+</head>
+<body>
+<main>
+<p>Once you eject a theme, it is yours -- including the parts you did not mean to
+own. The copy will not pick up fixes shipped to the built-in theme later. A
+little discipline keeps that from hurting.</p>
+<h2 id="prefer-options-over-edits">Prefer options over edits</h2>
+<p>Every change you can express as a theme option is a change you did <strong>not</strong> fork.
+Options survive upgrades cleanly because they live in your config, not in a
+copied template. Edit templates only for things options cannot reach, like a new
+header band or a restructured post list.</p>
+<h2 id="keep-the-diff-small-and-legible">Keep the diff small and legible</h2>
+<ul>
+<li>Change one thing at a time and keep the template close to the original, so a
+  future <code>diff</code> against the upstream theme is readable.</li>
+<li>Leave a comment where you depart from the original and why.</li>
+<li>Treat <code>layout/</code> as source code: review it, and rebuild after every change to
+  confirm nothing broke.</li>
+</ul>
+<p>A focused fork you understand beats a pristine theme you cannot bend. See
+[[Theme options vs. editing templates]] for where to draw that line.</p></main>
+</body>
+</html>

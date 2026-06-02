@@ -1,0 +1,13 @@
+name = "custom"
+version = "0.1.0"
+default_template = "post.html.j2"
+
+# Theme options: defaults declared by the layout, overridable per-site via
+# ``Config.theme`` (a shallow per-key merge). Templates read them as
+# ``theme.<key>``; every key referenced in a template must exist here, because
+# rendering uses Jinja's StrictUndefined.
+[options]
+accent = "#0b66c3"
+tagline = "A custom-themed pyssg blog"
+footer_note = "Built with pyssg."
+show_reading_time = true

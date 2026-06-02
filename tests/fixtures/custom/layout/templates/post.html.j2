@@ -1,0 +1,20 @@
+{% extends "base.html.j2" %}
+{% block content %}
+{# `date` is optional frontmatter; use .get so a dateless post still renders. #}
+{% set post_date = page.get('date') %}
+<article class="post">
+<header class="post-header">
+<h1>{{ page.title }}</h1>
+<p class="post-meta">
+{% if post_date %}<time datetime="{{ post_date }}">{{ post_date }}</time>{% endif %}
+{% if theme.show_reading_time and reading_time %}<span class="reading-time">{{ t("post.reading_time", minutes=reading_time) }}</span>{% endif %}
+</p>
+</header>
+{{ content_html }}
+{% if tags %}<p class="tags">{% for t in tags %}<a href="/tags/{{ t }}/">#{{ t }}</a> {% endfor %}</p>{% endif %}
+</article>
+<nav class="post-nav">
+{% if prev %}<a class="prev" href="{{ prev.url }}">&larr; {{ prev.title }}</a>{% endif %}
+{% if next %}<a class="next" href="{{ next.url }}">{{ next.title }} &rarr;</a>{% endif %}
+</nav>
+{% endblock %}
