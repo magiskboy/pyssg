@@ -72,8 +72,11 @@ conflicts with the code/conventions, **follow the code**; do not block on
     not the wiring itself.
   - Fold any instance configuration that changes rendered output into
     `cache_version` (see `markdown`/`highlight`) so the render cache stays correct.
-  - Existing plugins predate this convention and will be refactored to match
-    incrementally; `markdown` is the reference implementation.
+  - Existing plugins predate this convention and are being refactored to match
+    incrementally; `markdown`, `rss`, `taxonomy` and `collections` are the
+    reference implementations (the latter three also show the locale-aware
+    summarizer pattern: read `doc.meta["lang"]`, partition generated pages per
+    locale via `pyssg.plugins._context.locale_root` / `localize_route`).
 
 ## Environment & package management
 - **`uv` is the project's sole Python + package manager.** Do not use
