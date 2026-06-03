@@ -95,9 +95,7 @@ class TaxonomyI18nTest(unittest.TestCase):
     def _localized_build(self) -> Build:
         build = _build()
         _add_doc_page(build, "vi/a.md", "/a/", {"title": "A", "tags": ["python"], "lang": "vi"})
-        _add_doc_page(
-            build, "en/a.md", "/en/a/", {"title": "A", "tags": ["python"], "lang": "en"}
-        )
+        _add_doc_page(build, "en/a.md", "/en/a/", {"title": "A", "tags": ["python"], "lang": "en"})
         build_taxonomies(build, [tag()])
         return build
 

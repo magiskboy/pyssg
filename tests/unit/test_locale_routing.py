@@ -12,7 +12,7 @@ import unittest
 
 from pyssg.core.node import Document
 from pyssg.core.types import NodeKind
-from pyssg.plugins._context import doc_locale, localize_route, locale_root
+from pyssg.plugins._context import doc_locale, locale_root, localize_route
 
 
 class DocLocaleTest(unittest.TestCase):

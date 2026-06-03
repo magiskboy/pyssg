@@ -92,17 +92,17 @@ def _pubdate(date: object) -> str:
     if isinstance(date, dt.datetime):
         moment = date
     elif isinstance(date, dt.date):
-        moment = dt.datetime(date.year, date.month, date.day, tzinfo=dt.timezone.utc)
+        moment = dt.datetime(date.year, date.month, date.day, tzinfo=dt.UTC)
     elif isinstance(date, str):
         try:
             parsed = dt.date.fromisoformat(date[:10])
         except ValueError:
             return ""
-        moment = dt.datetime(parsed.year, parsed.month, parsed.day, tzinfo=dt.timezone.utc)
+        moment = dt.datetime(parsed.year, parsed.month, parsed.day, tzinfo=dt.UTC)
     if moment is None:
         return ""
     if moment.tzinfo is None:
-        moment = moment.replace(tzinfo=dt.timezone.utc)
+        moment = moment.replace(tzinfo=dt.UTC)
     return format_datetime(moment)
 
 
@@ -244,9 +244,7 @@ def _set_feed_page(build: Build, pid: str, url: str, xml: str) -> None:
         existing.template = None
         existing.meta = meta
     else:
-        build.graph.add_node(
-            Page(id=pid, kind=NodeKind.PAGE, url=url, template=None, meta=meta)
-        )
+        build.graph.add_node(Page(id=pid, kind=NodeKind.PAGE, url=url, template=None, meta=meta))
 
 
 def build_rss(build: Build, title: str | None = None) -> None:
