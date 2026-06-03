@@ -111,6 +111,48 @@ def page_url_of(build: Build, doc_id: str) -> str | None:
     return None
 
 
+def doc_locale(doc: Document | None) -> str:
+    """Locale tag a document carries, or ``""`` when it is not localised.
+
+    The i18n plugin stamps ``meta["lang"]`` on every document under a locale
+    directory (see :mod:`pyssg.plugins.i18n`). Summarizer plugins
+    (rss/taxonomy/collections) read it to partition their generated pages per
+    locale. A site without i18n leaves the tag unset, so this returns ``""`` and
+    callers collapse to single-locale behaviour.
+    """
+    if doc is None:
+        return ""
+    lang = doc.meta.get("lang")
+    return lang if isinstance(lang, str) else ""
+
+
+def locale_root(locale: str, sample_url: str) -> str:
+    """URL root under which a locale's generated pages live.
+
+    Returns ``"/{locale}/"`` when that locale's pages are URL-prefixed -- every
+    non-default locale is, per the i18n routing rule -- and ``"/"`` otherwise:
+    the default locale is served at the site root, as is a site with no i18n. The
+    decision is read straight from a representative member URL (``sample_url``),
+    so it needs neither knowledge of which locale is the default nor any ordering
+    against the i18n plugin's own pass.
+    """
+    if locale and sample_url.startswith(f"/{locale}/"):
+        return f"/{locale}/"
+    return "/"
+
+
+def localize_route(route: str, root: str) -> str:
+    """Re-root an absolute ``route`` (``"/"``, ``"/blog/"``) under a locale ``root``.
+
+    ``root`` is a value returned by :func:`locale_root`. For the default root
+    (``"/"``) the route is returned unchanged; for ``"/en/"`` the locale segment
+    is prepended (``"/blog/"`` -> ``"/en/blog/"``, ``"/"`` -> ``"/en/"``).
+    """
+    if root == "/":
+        return route
+    return root.rstrip("/") + route
+
+
 def _breadcrumbs(build: Build, page: Page) -> list[Crumb]:
     titles = _url_titles(build)
     crumbs: list[Crumb] = [{"title": titles.get("/", "Home"), "url": "/"}]
