@@ -93,7 +93,7 @@ Plugin chỉ là lớp tiện ích; bạn có thể build cùng vault đó từ 
 `obsidian`. Tạo một site kiểu vault mới:
 
 ```bash
-pyssg init --preset obsidian --site my-vault
+pyssg --site my-vault new site --preset obsidian
 pyssg --site my-vault build
 pyssg --site my-vault serve   # xem trước trực tiếp, tự tải lại
 ```

@@ -94,7 +94,7 @@ The plugin is a convenience layer; you can build the same vault from the termina
 with the `obsidian` preset. Scaffold a fresh vault-style site:
 
 ```bash
-pyssg init --preset obsidian --site my-vault
+pyssg --site my-vault new site --preset obsidian
 pyssg --site my-vault build
 pyssg --site my-vault serve   # live preview with reload
 ```
