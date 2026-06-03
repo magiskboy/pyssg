@@ -9,13 +9,18 @@
 #   CLOUDFLARE_ACCOUNT_ID  the account that owns the Worker
 name: Deploy docs
 
-# Re-deploy when the docs site (or this workflow) changes on main; manual
-# dispatch stays available for ad-hoc deploys.
+# Re-deploy when the docs site, the documented package, or this workflow changes
+# on main; manual dispatch stays available for ad-hoc deploys.
+#
+# `pyssg/**` is included because the site's References section is generated from
+# the `pyssg` package's docstrings (via the apidoc plugin reading ../pyssg), so a
+# docstring-only edit outside docs/ must still rebuild and redeploy the site.
 on:
   push:
     branches: [main]
     paths:
       - "docs/**"
+      - "pyssg/**"
       - ".github/workflows/deploy-docs.yml"
   workflow_dispatch:
 
