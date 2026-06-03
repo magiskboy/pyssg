@@ -14,10 +14,10 @@ from pyssg.core.types import NodeKind
 from pyssg.plugins.markdown import MarkdownPlugin, markdown
 
 
-def _build(tmp_path: Path) -> Build:
+def _build(tmp_path: Path, plugin: MarkdownPlugin | None = None) -> Build:
     builder = Builder(config=Config(output_dir="dist"), site_dir=tmp_path)
     build = builder.create_build()
-    markdown().apply(builder)
+    (plugin or markdown()).apply(builder)
     builder.hooks.this_compilation.call(build)
     return build
 
@@ -107,3 +107,73 @@ class MarkdownPluginTest(unittest.TestCase):
         self.assertEqual(loaded.kind, NodeKind.MARKDOWN)
         self.assertEqual(loaded.meta["__raw__"], "# Hi")
         self.assertIsNone(self.build.hooks.load_node.call(str(self.tmp_path / "data.json")))
+
+
+class MarkdownConfigurationTest(unittest.TestCase):
+    """Extra extensions / extension_configs can be supplied without subclassing."""
+
+    def setUp(self) -> None:
+        self.tmp_path = Path(self.enterContext(tempfile.TemporaryDirectory()))
+
+    def test_extra_extension_is_applied(self) -> None:
+        # ``nl2br`` (ships with Python-Markdown) turns single newlines into <br>.
+        build = _build(self.tmp_path, markdown(extensions=["nl2br"]))
+        node = _parse(build, "line one\nline two")
+        self.assertIn("<br", str(node.meta["content_html"]))
+
+    def test_default_engine_does_not_break_single_newlines(self) -> None:
+        # Guard the contrast: without nl2br a soft break stays a space, not <br>.
+        build = _build(self.tmp_path, markdown())
+        node = _parse(build, "line one\nline two")
+        self.assertNotIn("<br", str(node.meta["content_html"]))
+
+    def test_extension_configs_forwarded_to_toc(self) -> None:
+        build = _build(self.tmp_path, markdown(extension_configs={"toc": {"permalink": True}}))
+        node = _parse(build, "## Section")
+        self.assertIn("headerlink", str(node.meta["content_html"]))
+
+    def test_toc_slugify_survives_caller_toc_config(self) -> None:
+        # Supplying a toc config must not drop the project slugify default.
+        build = _build(self.tmp_path, markdown(extension_configs={"toc": {"permalink": True}}))
+        node = _parse(build, "## Giới thiệu")
+        self.assertIn('id="giới-thiệu"', str(node.meta["content_html"]))
+
+    def test_cache_version_changes_with_configuration(self) -> None:
+        default = markdown().cache_version
+        self.assertEqual(default, "2.0.0")
+        with_ext = markdown(extensions=["nl2br"]).cache_version
+        with_cfg = markdown(extension_configs={"toc": {"permalink": True}}).cache_version
+        self.assertNotEqual(default, with_ext)
+        self.assertNotEqual(default, with_cfg)
+        self.assertNotEqual(with_ext, with_cfg)
+
+    def test_cache_version_is_deterministic(self) -> None:
+        first = markdown(extensions=["nl2br"], extension_configs={"toc": {"permalink": True}})
+        second = markdown(extensions=["nl2br"], extension_configs={"toc": {"permalink": True}})
+        self.assertEqual(first.cache_version, second.cache_version)
+
+
+class MarkdownSubclassTest(unittest.TestCase):
+    """Subclasses can customise the engine via the documented override points."""
+
+    def setUp(self) -> None:
+        self.tmp_path = Path(self.enterContext(tempfile.TemporaryDirectory()))
+
+    def test_subclass_can_extend_default_extensions(self) -> None:
+        class NlToBrMarkdown(MarkdownPlugin):
+            default_extensions = (*MarkdownPlugin.default_extensions, "nl2br")
+
+        build = _build(self.tmp_path, NlToBrMarkdown())
+        node = _parse(build, "line one\nline two")
+        self.assertIn("<br", str(node.meta["content_html"]))
+
+    def test_subclass_can_override_extension_configs(self) -> None:
+        class PermalinkMarkdown(MarkdownPlugin):
+            def resolve_extension_configs(self) -> dict[str, object]:
+                configs = super().resolve_extension_configs()
+                configs["toc"] = {**configs["toc"], "permalink": True}
+                return configs
+
+        build = _build(self.tmp_path, PermalinkMarkdown())
+        node = _parse(build, "## Section")
+        self.assertIn("headerlink", str(node.meta["content_html"]))

@@ -57,6 +57,23 @@ conflicts with the code/conventions, **follow the code**; do not block on
 - **`route` hook contract:** a `route` tap returning the empty string `""` means
   "no page" - the permalink generator emits nothing for that document. Plugins
   use this to suppress output (e.g. i18n drops documents outside any locale dir).
+- **Plugins are classes designed for subclass customization.** A plugin is a
+  class plus a thin lowercase factory; users customize *either* by passing
+  options to the factory *or* by subclassing the class and overriding behavior -
+  never by copy-pasting the plugin to tweak one line. When writing a new plugin:
+  - Surface every reasonable knob as a keyword-only `__init__` argument with a
+    sensible default (e.g. `markdown(extensions=..., extension_configs=...)`),
+    and forward third-party engine options through rather than hard-coding them.
+  - Build internal collaborators (parsers, formatters, the config dict) in small,
+    named, overridable methods (e.g. `build_markdown`, `resolve_extension_configs`)
+    and read tunables from class attributes (e.g. `default_extensions`) so a
+    subclass can override one step without reimplementing `apply`.
+  - Keep `apply` (the hook wiring) stable; subclasses customize *what* gets wired,
+    not the wiring itself.
+  - Fold any instance configuration that changes rendered output into
+    `cache_version` (see `markdown`/`highlight`) so the render cache stays correct.
+  - Existing plugins predate this convention and will be refactored to match
+    incrementally; `markdown` is the reference implementation.
 
 ## Environment & package management
 - **`uv` is the project's sole Python + package manager.** Do not use
