@@ -11,6 +11,40 @@ version or commit if you depend on it.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-03
+
+Plugin-design and i18n release. The summarizer plugins gained per-locale output
+and were refactored into subclass-friendly classes, and two new built-ins close
+gaps surfaced while migrating a real multilingual blog. Builds remain
+deterministic and incremental rebuilds byte-identical to a full build.
+
+### Added
+
+- **Redirects plugin** — `redirects({old_url: new_url, ...})` emits a
+  `meta refresh` HTML page per rule (with a canonical link and `noindex`), so
+  links to retired paths keep resolving after a migration. Rules are literal and
+  a rule whose source collides with a real page is skipped.
+- **Static-file mounts** — `asset_copy(mounts=[(source, dest), ...])` publishes
+  arbitrary static trees (e.g. a site-local `static/` at the output root for
+  `/style.css`, `/images/...`, `/robots.txt`), in addition to the layout's
+  `assets/`. Sources may be relative (to the site) or absolute; a collision with
+  a generated page or another mount aborts the build with a clear error before
+  anything is written.
+- **Configurable Markdown** — `markdown(extensions=..., extension_configs=...)`
+  forwards Python-Markdown options through, and `highlight(linenums=...)`
+  toggles code line numbers. Both fold their configuration into the render cache.
+
+### Changed
+
+- **Locale-aware feeds, taxonomy, and pagination** — on an i18n site the RSS
+  feed, `/tags/` & `/categories/` term pages, and collection pagination are now
+  partitioned per locale (the default locale at the root, others URL-prefixed),
+  so generated pages never mix languages. RSS items also carry `<guid>` and
+  `<pubDate>`.
+- **Subclass-friendly plugins** — `markdown`, `rss`, `taxonomy`, and
+  `collections` were refactored into classes with small overridable methods, so
+  a site customizes behavior by subclassing rather than forking the plugin.
+
 ## [0.1.0] - 2026-06-02
 
 First release of the rewritten pyssg. The core (`pyssg.core`) is pure standard
@@ -61,5 +95,6 @@ incremental rebuild is byte-identical to a full rebuild.
   References section of the docs site from Python docstrings.
 - **CLI** — `init`, `build`, `serve`, `clean`, and `eject-layout`.
 
-[Unreleased]: https://github.com/magiskboy/pyssg/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/magiskboy/pyssg/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/magiskboy/pyssg/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/magiskboy/pyssg/releases/tag/v0.1.0

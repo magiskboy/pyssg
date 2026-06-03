@@ -1,6 +1,6 @@
 [project]
 name = "pyssg"
-version = "0.1.0"
+version = "0.2.0"
 description = "Incremental static site generator for Markdown, with a Webpack-inspired hook + dependency-graph architecture."
 readme = "README.md"
 requires-python = ">=3.13"
