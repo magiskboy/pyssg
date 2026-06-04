@@ -6,7 +6,7 @@ order: 5
 
 # The linking model
 
-pyssg treats links as first-class data, not just text in the output. That is what
+PySSG treats links as first-class data, not just text in the output. That is what
 makes wikilinks, transclusion, backlinks, and safe internal links work together.
 
 ## Internal Markdown links
@@ -52,7 +52,7 @@ the embedded document's *finalized* HTML (links already resolved) to splice in.
 
 ## Backlinks
 
-Because every resolved link is stored as a reverse edge in the graph, pyssg can
+Because every resolved link is stored as a reverse edge in the graph, PySSG can
 show, on any page, which other pages link to it - with no extra configuration. The
 backlink list is derived from the same `LINK` connections the resolver records, so
 it is always consistent with the actual links in your content.

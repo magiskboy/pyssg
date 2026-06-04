@@ -12,7 +12,7 @@ tap. For the auto-generated, per-symbol API of every module, see the
 
 ## Built-in plugins (`pyssg.plugins`)
 
-These are the plugins bundled with pyssg and used by the presets.
+These are the plugins bundled with PySSG and used by the presets.
 
 | Plugin | Purpose |
 |---|---|

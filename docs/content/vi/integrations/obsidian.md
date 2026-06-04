@@ -22,7 +22,7 @@ muốn. Bạn không cần biết Python.
 
 Plugin chưa có trên cửa hàng cộng đồng nên hãy cài thủ công:
 
-1. Build từ kho pyssg:
+1. Build từ kho PySSG:
 
    ```bash
    cd adapters/pyssg-obsidian
@@ -87,7 +87,7 @@ bao giờ lẫn vào ghi chú hay bị Obsidian index lại.
 | pyssg version (git ref) | Nhánh, tag hoặc commit được cài khi tự dựng runtime. |
 | Reset managed runtime | Xoá runtime đã tải để dựng lại. |
 
-## Dùng pyssg không qua plugin
+## Dùng PySSG không qua plugin
 
 Plugin chỉ là lớp tiện ích; bạn có thể build cùng vault đó từ terminal với preset
 `obsidian`. Tạo một site kiểu vault mới:
@@ -124,16 +124,16 @@ CLI](../reference/cli.md) và [tham chiếu cấu hình](../reference/configurat
 ## Cách runtime Python được dựng tự động
 
 Lần đầu build hoặc xem trước, plugin tải [uv](https://docs.astral.sh/uv/) (một
-binary tĩnh nhỏ gọn), dùng nó cài một Python tự quản và một bản pyssg độc lập, rồi
+binary tĩnh nhỏ gọn), dùng nó cài một Python tự quản và một bản PySSG độc lập, rồi
 lưu cache vào thư mục dữ liệu ứng dụng dùng chung - không bao giờ nằm trong vault.
 Việc này chạy một lần ở chế độ nền; sau đó build khởi động tức thì. Hãy ghim phiên
-bản pyssg qua cài đặt **pyssg version (git ref)** để cài đặt tái lập được.
+bản PySSG qua cài đặt **pyssg version (git ref)** để cài đặt tái lập được.
 
 ## Khắc phục sự cố
 
 - **Dựng runtime lỗi hoặc treo.** Dùng **Reset managed runtime** trong cài đặt
   rồi build lại để dựng lại từ đầu.
-- **Máy offline hoặc bị quản lý.** Tự cài pyssg và đặt đường dẫn **pyssg
+- **Máy offline hoặc bị quản lý.** Tự cài PySSG và đặt đường dẫn **pyssg
   executable** trong cài đặt; plugin sẽ bỏ qua bước tải.
 - **Một note không chịu publish.** Kiểm tra frontmatter có `publish: true` (ở chế
   độ allowlist) và note không nằm trong thư mục bị loại.

@@ -22,7 +22,7 @@ command line if you prefer. You do not need to know Python.
 
 The plugin is not yet in the community store, so install it manually:
 
-1. Build it from the pyssg repository:
+1. Build it from the PySSG repository:
 
    ```bash
    cd adapters/pyssg-obsidian
@@ -127,16 +127,16 @@ Then `pyssg --site <dir-containing-this-config> build`. See the
 
 The first time you build or preview, the plugin downloads
 [uv](https://docs.astral.sh/uv/) (a small static binary), uses it to install a
-managed Python and an isolated copy of pyssg, and caches everything in a shared
+managed Python and an isolated copy of PySSG, and caches everything in a shared
 application-data directory - never inside your vault. This runs once in the
-background; afterwards builds start instantly. Pin the pyssg version with the
+background; afterwards builds start instantly. Pin the PySSG version with the
 **pyssg version (git ref)** setting for reproducible installs.
 
 ## Troubleshooting
 
 - **Setup failed or seems stuck.** Use **Reset managed runtime** in settings, then
   build again to re-provision from scratch.
-- **Offline or managed machine.** Install pyssg yourself and set the **pyssg
+- **Offline or managed machine.** Install PySSG yourself and set the **pyssg
   executable** path in settings; the plugin then skips the download entirely.
 - **A note will not publish.** Confirm its frontmatter has `publish: true` (in
   allowlist mode) and that it is not inside an excluded folder.

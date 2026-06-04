@@ -23,7 +23,7 @@ gieo một danh sách công việc từ các sự kiện hệ thống tệp và 
 ## Hook
 
 Bên trong và xung quanh các pha, plugin gắn vào các **hook**. Một hook là một điểm
-mở rộng có kiểu; pyssg mượn bốn "vị" từ tapable, mỗi vị có một ngữ nghĩa luồng giá
+mở rộng có kiểu; PySSG mượn bốn "vị" từ tapable, mỗi vị có một ngữ nghĩa luồng giá
 trị khác nhau:
 
 - **SyncHook** - gọi mọi tap để lấy hiệu ứng phụ.

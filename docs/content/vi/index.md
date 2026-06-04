@@ -4,9 +4,9 @@ nav_title: Tổng quan
 order: 1
 ---
 
-# pyssg
+# PySSG
 
-**pyssg** là một trình tạo trang tĩnh (static site generator) nhanh, hỗ trợ build
+**PySSG** là một trình tạo trang tĩnh (static site generator) nhanh, hỗ trợ build
 tăng tiến (incremental) cho Markdown, với kiến trúc plugin lấy cảm hứng từ
 Webpack. Nó được xây dựng cho **trang tài liệu**, **blog** và các **wiki / cơ sở
 tri thức** lớn.
@@ -16,7 +16,7 @@ bên thứ ba đều nằm ở các plugin ngoại vi. Quá trình build có tí
 (deterministic) - build hai lần cho ra kết quả giống nhau từng byte, và một lần
 build tăng tiến được đảm bảo giống hệt từng byte so với build lại toàn bộ.
 
-> Chính trang tài liệu này cũng được build bằng pyssg. Mục **References** trong
+> Chính trang tài liệu này cũng được build bằng PySSG. Mục **References** trong
 > thanh bên được sinh tự động từ docstring của dự án bởi plugin contrib
 > [`apidoc`](how-to/api-reference.md).
 
@@ -36,7 +36,7 @@ bốn loại, mỗi loại phục vụ một nhu cầu khác nhau:
 - **[Tham chiếu (Reference)](reference/index.md)** - định hướng thông tin, mô tả
   chính xác về CLI, cấu hình, frontmatter và các plugin tích hợp sẵn.
 - **[Diễn giải (Explanation)](explanation/index.md)** - định hướng hiểu sâu, bàn
-  về *vì sao* pyssg hoạt động như vậy (kiến trúc, pipeline plugin, build tăng
+  về *vì sao* PySSG hoạt động như vậy (kiến trúc, pipeline plugin, build tăng
   tiến, mô hình liên kết).
 - **[References](/references/pyssg/)** - API reference sinh tự động cho gói
   `pyssg`.

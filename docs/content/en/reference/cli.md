@@ -6,7 +6,7 @@ order: 2
 
 # CLI reference
 
-pyssg is invoked as a module: `python -m pyssg [--site PATH] <command> [options]`.
+PySSG is invoked as a module: `python -m pyssg [--site PATH] <command> [options]`.
 Through uv that is `pyssg ...`.
 
 ## Global option

@@ -8,7 +8,7 @@ order: 4
 
 Each Markdown document may start with a YAML frontmatter block delimited by `---`.
 The `frontmatter` plugin parses it into the document's metadata, which later
-plugins read. The fields below are the ones pyssg's built-in plugins understand;
+plugins read. The fields below are the ones PySSG's built-in plugins understand;
 any other keys are kept and made available to templates.
 
 ```markdown

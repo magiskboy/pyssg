@@ -6,8 +6,8 @@ order: 1
 
 # Integrations
 
-Integrations connect pyssg to the tools you already write in. Each one is an
-official **adapter** - a thin layer that drives a pyssg build from another
+Integrations connect PySSG to the tools you already write in. Each one is an
+official **adapter** - a thin layer that drives a PySSG build from another
 application - and lives in the project's `adapters/<name>/` directory with its
 own toolchain.
 

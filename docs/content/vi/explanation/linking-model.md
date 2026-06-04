@@ -6,7 +6,7 @@ order: 5
 
 # Mô hình liên kết
 
-pyssg coi liên kết là dữ liệu hạng nhất, không chỉ là văn bản trong đầu ra. Đó là
+PySSG coi liên kết là dữ liệu hạng nhất, không chỉ là văn bản trong đầu ra. Đó là
 thứ khiến wikilink, transclusion, backlink và liên kết nội bộ an toàn cùng hoạt
 động ăn khớp.
 
@@ -54,7 +54,7 @@ Transclusion chạy trong `expand_content`, sau `finalize_content`, vì nó cầ
 
 ## Backlink
 
-Vì mỗi liên kết đã phân giải được lưu thành một cạnh chiều ngược trong đồ thị, pyssg
+Vì mỗi liên kết đã phân giải được lưu thành một cạnh chiều ngược trong đồ thị, PySSG
 có thể hiển thị, trên bất kỳ trang nào, những trang nào khác liên kết tới nó - mà
 không cần cấu hình thêm. Danh sách backlink được suy ra từ chính các connection
 `LINK` mà bộ phân giải ghi lại, nên nó luôn nhất quán với các liên kết thực sự

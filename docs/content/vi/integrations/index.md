@@ -6,8 +6,8 @@ order: 1
 
 # Tích hợp
 
-Các tích hợp kết nối pyssg với những công cụ bạn đang dùng để viết. Mỗi tích hợp
-là một **adapter** chính thức - một lớp mỏng điều khiển quá trình build của pyssg
+Các tích hợp kết nối PySSG với những công cụ bạn đang dùng để viết. Mỗi tích hợp
+là một **adapter** chính thức - một lớp mỏng điều khiển quá trình build của PySSG
 từ một ứng dụng khác - nằm trong thư mục `adapters/<tên>/` của dự án với bộ công
 cụ riêng.
 

@@ -6,7 +6,7 @@ order: 4
 
 # Incremental builds and determinism
 
-The single most important property of pyssg is this invariant:
+The single most important property of PySSG is this invariant:
 
 > **An incremental rebuild is byte-identical to a full rebuild.**
 
@@ -16,7 +16,7 @@ what that means and how it is achieved.
 ## Determinism first
 
 Before incremental builds can be *correct*, builds must be **deterministic**:
-building the same inputs twice produces byte-identical output. pyssg enforces this
+building the same inputs twice produces byte-identical output. PySSG enforces this
 by making every processing unit pure with respect to its declared inputs:
 
 - no global mutable state,
@@ -45,7 +45,7 @@ runs, a rebuilt node cannot diverge from its full-build version.
 ## A worked example: navigation
 
 Navigation appears on every page, so it is the classic "how can this possibly stay
-incremental?" case. pyssg handles it without any special-casing in the `nav`
+incremental?" case. PySSG handles it without any special-casing in the `nav`
 plugin:
 
 - A **structural** change (add, move, or delete a document) changes the menu.

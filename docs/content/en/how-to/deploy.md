@@ -33,7 +33,7 @@ config = docs(
 
 ## 3. Deploy with `pyssg deploy`
 
-pyssg ships a built-in deploy command for the common hosts. Declare per-target
+PySSG ships a built-in deploy command for the common hosts. Declare per-target
 options under `Config.deploy` (keyed by target name), then run
 `pyssg deploy <target>`. The command builds the site, uploads the output, and
 records the result so a re-run with byte-identical output is a no-op.
@@ -89,7 +89,7 @@ A few common targets:
 
 ## 5. Keep builds reproducible in CI
 
-pyssg builds are deterministic: given the same inputs, two builds produce
+PySSG builds are deterministic: given the same inputs, two builds produce
 byte-identical output. In CI, run a full `build` (the cache is an optimization,
 not a correctness requirement) - pass `--no-cache` if you want to prove a clean
 build from scratch:

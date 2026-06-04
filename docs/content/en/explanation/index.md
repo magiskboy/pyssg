@@ -6,7 +6,7 @@ order: 1
 
 # Explanation
 
-These pages discuss *why* pyssg is built the way it is. They are for understanding,
+These pages discuss *why* PySSG is built the way it is. They are for understanding,
 not for step-by-step tasks - read them when you want the mental model behind the
 tool.
 

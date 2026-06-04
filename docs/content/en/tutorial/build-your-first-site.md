@@ -17,7 +17,7 @@ working result. You do not need to understand every detail yet - the
 ## Prerequisites
 
 - **Python 3.13+** and **[uv](https://github.com/astral-sh/uv)** installed.
-- pyssg available. The simplest way while you learn is to clone the repository
+- PySSG available. The simplest way while you learn is to clone the repository
   and run everything through `uv run`:
 
   ```bash

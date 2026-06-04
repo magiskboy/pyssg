@@ -81,7 +81,7 @@ lặp sẽ ném `HookOrderError`.
 
 ## Các quy tắc mọi plugin phải tuân theo
 
-Đây không phải tùy chọn - chúng là thứ giữ cho các đảm bảo build của pyssg đứng
+Đây không phải tùy chọn - chúng là thứ giữ cho các đảm bảo build của PySSG đứng
 vững:
 
 1. **Thuần khiết theo các đầu vào đã khai báo.** Không có trạng thái toàn cục có

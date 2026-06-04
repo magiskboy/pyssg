@@ -6,7 +6,7 @@ order: 2
 
 # Architecture
 
-pyssg is organized as a **small pure kernel** surrounded by **peripheral
+PySSG is organized as a **small pure kernel** surrounded by **peripheral
 plugins**, in the spirit of Webpack's compiler/plugin split. Understanding this
 boundary explains most of the design decisions.
 

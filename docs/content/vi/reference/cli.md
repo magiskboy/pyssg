@@ -6,7 +6,7 @@ order: 2
 
 # Tham chiếu CLI
 
-pyssg được gọi như một module: `python -m pyssg [--site PATH] <command> [options]`.
+PySSG được gọi như một module: `python -m pyssg [--site PATH] <command> [options]`.
 Qua uv là `pyssg ...`.
 
 ## Tùy chọn toàn cục

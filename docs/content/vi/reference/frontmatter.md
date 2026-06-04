@@ -8,7 +8,7 @@ order: 4
 
 Mỗi tài liệu Markdown có thể bắt đầu bằng một khối frontmatter YAML phân định bởi
 `---`. Plugin `frontmatter` phân tích nó thành metadata của tài liệu để các plugin
-sau đọc. Các trường bên dưới là những trường mà các plugin tích hợp của pyssg hiểu;
+sau đọc. Các trường bên dưới là những trường mà các plugin tích hợp của PySSG hiểu;
 mọi khóa khác được giữ lại và cấp cho template.
 
 ```markdown

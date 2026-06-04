@@ -6,7 +6,7 @@ order: 1
 
 # Diễn giải
 
-Những trang này bàn về *vì sao* pyssg được xây dựng như vậy. Chúng dành cho việc
+Những trang này bàn về *vì sao* PySSG được xây dựng như vậy. Chúng dành cho việc
 hiểu sâu, không phải các tác vụ từng bước - hãy đọc khi bạn muốn nắm mô hình tư
 duy đằng sau công cụ.
 

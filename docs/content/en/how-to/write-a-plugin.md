@@ -80,7 +80,7 @@ Before every call the taps are topologically sorted; a constraint cycle raises
 
 ## The rules every plugin must follow
 
-These are not optional - they are what makes pyssg's build guarantees hold:
+These are not optional - they are what makes PySSG's build guarantees hold:
 
 1. **Be pure with respect to declared inputs.** No global mutable state, and no
    direct `datetime.now()` / `time` / `random`. Building twice must be

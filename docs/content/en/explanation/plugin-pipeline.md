@@ -24,7 +24,7 @@ seeds a worklist from filesystem events and converges to the same result.
 ## Hooks
 
 Within and around the phases, plugins attach to **hooks**. A hook is a typed
-extension point; pyssg borrows four flavors from tapable, each with a different
+extension point; PySSG borrows four flavors from tapable, each with a different
 value-flow semantic:
 
 - **SyncHook** - call every tap for its side effects.

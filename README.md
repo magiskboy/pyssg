@@ -1,4 +1,4 @@
-# pyssg
+# PySSG
 
 ![Status: in development](https://img.shields.io/badge/status-in%20development-orange)
 
@@ -11,7 +11,7 @@ lives in a peripheral plugin. Builds are deterministic — building twice produc
 byte-identical output.
 
 > **Pre-1.0 and in active development.** The public API, configuration, and
-> built-in themes may still change without notice. If you depend on pyssg, pin a
+> built-in themes may still change without notice. If you depend on PySSG, pin a
 > specific commit.
 
 ## Features
@@ -44,7 +44,7 @@ byte-identical output.
 
 ## Installation
 
-pyssg is installed directly from GitHub (it is not published to PyPI).
+PySSG is installed directly from GitHub (it is not published to PyPI).
 
 To add it as a dependency in your own project:
 
