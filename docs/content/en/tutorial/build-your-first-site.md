@@ -40,7 +40,7 @@ A **preset** is a ready-made configuration that bundles the right plugins and a
 default theme. Scaffold a documentation site with the `docs` preset:
 
 ```bash
-pyssg --site my-site init --preset docs
+pyssg --site my-site new site --preset docs
 ```
 
 This creates three files:

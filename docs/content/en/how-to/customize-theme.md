@@ -11,10 +11,10 @@ from a built-in theme instead of from scratch.
 
 ## 1. Eject a built-in theme
 
-`eject-layout` copies a built-in theme into your site so you can edit it:
+`new theme` copies a built-in theme into your site so you can edit it:
 
 ```bash
-pyssg --site my-site eject-layout --theme docs --to layouts/theme
+pyssg --site my-site new theme --name docs --to layouts/theme
 ```
 
 This copies the `docs` theme into `my-site/layouts/theme/`. (The available themes

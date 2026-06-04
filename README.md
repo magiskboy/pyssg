@@ -66,7 +66,7 @@ bundles the right plugins and a default theme.
 
 ```bash
 # Scaffold a new site (use --preset blog for a blog)
-pyssg --site my-site init --preset docs
+pyssg --site my-site new site --preset docs
 
 # Build to my-site/dist
 pyssg --site my-site build
@@ -75,8 +75,8 @@ pyssg --site my-site build
 pyssg --site my-site serve
 ```
 
-`init` writes a one-line config plus some sample content. The whole config file
-is just:
+`new site` writes a one-line config plus some sample content. The whole config
+file is just:
 
 ```python
 from __future__ import annotations
@@ -98,14 +98,18 @@ Edit any file under `content/` and the page rebuilds and reloads automatically.
 
 | Command | Description |
 |---|---|
-| `init --preset docs\|blog` | Scaffold a new site for a preset. |
+| `new site --preset docs\|blog\|obsidian` | Scaffold a new site for a preset. |
+| `new post --title "..."` | Scaffold a blog post under `content/posts/`. |
+| `new theme --name docs\|blog --to DIR` | Copy a built-in theme into your site to customize templates/CSS. |
+| `new plugin NAME` | Scaffold a starter plugin module under `plugins/`. |
 | `build` | Full build to `output_dir`. |
 | `serve` | Watch + incremental rebuild + dev server with live-reload. |
 | `clean` | Remove `output_dir` and cache. |
-| `eject-layout --theme docs\|blog --to DIR` | Copy a built-in theme into your site to customize templates/CSS. |
+| `deploy list\|status\|<target>` | Push the built site to a hosting provider. |
 
 Pass `--site PATH` to select the site directory (defaults to the current one).
-Run any command with `--help` for its options.
+Run any command with `--help` for its options. The earlier `init` and
+`eject-layout` commands still work as aliases for `new site` / `new theme`.
 
 ## Internationalization (i18n)
 

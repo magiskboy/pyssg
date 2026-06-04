@@ -40,7 +40,7 @@ chọn thư mục trang; mặc định là thư mục hiện tại.
 Khởi tạo một trang tài liệu với preset `docs`:
 
 ```bash
-pyssg --site my-site init --preset docs
+pyssg --site my-site new site --preset docs
 ```
 
 Lệnh này tạo ba file:

@@ -11,10 +11,10 @@ một theme tích hợp sẵn thay vì làm lại từ đầu.
 
 ## 1. Tách (eject) một theme tích hợp
 
-`eject-layout` sao chép một theme tích hợp vào trang của bạn để bạn có thể sửa:
+`new theme` sao chép một theme tích hợp vào trang của bạn để bạn có thể sửa:
 
 ```bash
-pyssg --site my-site eject-layout --theme docs --to layouts/theme
+pyssg --site my-site new theme --name docs --to layouts/theme
 ```
 
 Lệnh này sao chép theme `docs` vào `my-site/layouts/theme/`. (Các theme có sẵn là

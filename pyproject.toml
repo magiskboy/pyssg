@@ -25,6 +25,7 @@ dependencies = [
     "pillow>=10.4",
     "watchdog>=4.0",
     "markdown>=3.10.2",
+    "typer>=0.26.7",
 ]
 
 [project.urls]
